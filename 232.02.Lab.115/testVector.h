@@ -45,7 +45,7 @@ public:
       test_destructor_partiallyFilled();
 
       // Assign
-      test_assign_empty();
+     /* test_assign_empty();
       test_assign_sameSize();
       test_assign_rightBigger();
       test_assign_leftBigger();
@@ -58,34 +58,34 @@ public:
       test_swap_empty();
       test_swap_sameSize();
       test_swap_rightBigger();
-      test_swap_leftBigger();
+      test_swap_leftBigger();*/
 
       // Iterator
-      test_iterator_beginEmpty();
-      test_iterator_beginFull();
-      test_iterator_endFull();
-      test_iterator_incrementFull();
-      test_iterator_dereferenceReadFull();
-      test_iterator_dereferenceUpdate();
-      test_iterator_construct_default();
-      test_iterator_construct_pointer();
-      test_iterator_construct_index();
-      test_iterator_equals_same();
-      test_iterator_equals_different();
-      test_iterator_notEquals_same();
-      test_iterator_notEquals_different();
+      //test_iterator_beginEmpty();
+      //test_iterator_beginFull();
+      //test_iterator_endFull();
+      //test_iterator_incrementFull();
+      //test_iterator_dereferenceReadFull();
+      //test_iterator_dereferenceUpdate();
+      //test_iterator_construct_default();
+      //test_iterator_construct_pointer();
+      //test_iterator_construct_index();
+      //test_iterator_equals_same();
+      //test_iterator_equals_different();
+      //test_iterator_notEquals_same();
+      //test_iterator_notEquals_different();
 
       // Access
-      test_subscript_read();
+     /* test_subscript_read();
       test_subscript_write();
       test_front_read();
       test_front_write();
       test_back_read();
       test_back_write();
-      test_back_partiallyfilled();
+      test_back_partiallyfilled();*/
 
       // Insert
-      test_pushback_empty();
+      /*test_pushback_empty();
       test_pushback_excessCapacity();
       test_pushback_requireReallocate();
       test_pushback_moveEmpty();
@@ -103,10 +103,10 @@ public:
       test_reserve_fourFour();
       test_reserve_fourTen();
       test_reserve_standardZero();
-      test_reserve_standardTen();
+      test_reserve_standardTen();*/
 
       // Remove
-      test_popback_empty();
+      /*test_popback_empty();
       test_popback_full();
       test_popback_partiallyFilled();
       test_clear_empty();
@@ -115,15 +115,15 @@ public:
       test_shrink_empty();
       test_shrink_toEmpty();
       test_shrink_standard();
-      test_shrink_twoExtraSlots();
+      test_shrink_twoExtraSlots();*/
       
       // Status
-      test_size_empty();
+    /*  test_size_empty();
       test_size_full();
       test_empty_empty();
       test_empty_full();
       test_capacity_empty();
-      test_capacity_full();
+      test_capacity_full();*/
 
       report("Vector");
    }

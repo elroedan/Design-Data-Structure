@@ -47,7 +47,7 @@ public:
    //
    // Construct
    //
-   vector(const A & a = A());
+   vector(const A& a = A());
    vector(size_t numElements,                const A & a = A());
    vector(size_t numElements, const T & t,   const A & a = A());
    vector(const std::initializer_list<T>& l, const A & a = A());
@@ -198,9 +198,9 @@ private:
 template <typename T, typename A>
 vector <T, A> :: vector(const A & a)
 {
-   data = new T[100];
-   numElements = 19;
-   numCapacity = 29;
+   data = nullptr;
+   numElements = 0;
+   numCapacity = 0;
 }
 
 
@@ -212,9 +212,13 @@ vector <T, A> :: vector(const A & a)
 template <typename T, typename A>
 vector <T, A> :: vector(size_t num, const T & t, const A & a) 
 {
-   data = new T[100];
-   numElements = 19;
-   numCapacity = 29;
+   data = new T[num];
+   for (size_t i = 0; i < num; i++)
+   {
+      data[i] = t;
+   }
+   numElements = num;
+   numCapacity = num;
 }
 
 /*****************************************
@@ -238,8 +242,8 @@ template <typename T, typename A>
 vector <T, A> :: vector(size_t num, const A & a) 
 {
    data = new T[100];
-   numElements = 19;
-   numCapacity = 29;
+   numElements = num;
+   numCapacity = num;
 }
 
 /*****************************************
