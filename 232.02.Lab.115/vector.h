@@ -110,9 +110,9 @@ public:
    //
    // Status
    //
-   size_t  size()          const { return 999;}
-   size_t  capacity()      const { return 999;}
-   bool empty()            const { return true;}
+   size_t  size()          const { return numElements;}
+   size_t  capacity()      const { return numCapacity;}
+   bool empty()            const { return numElements == 0;}
   
 private:
    
@@ -261,7 +261,7 @@ vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), n
 template <typename T, typename A>
 vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs.numCapacity), numElements(rhs.numElements)
 {
-   if (rhs.numElements > 0)
+   if (rhs.empty())
    {
       data = alloc.allocate(rhs.numElements);
       numCapacity = rhs.numElements;
@@ -303,7 +303,10 @@ vector <T, A> :: ~vector()
    //Loop through elements and destroy them each
    for (size_t i = 0; i < numElements; ++i)
    {
-      alloc.destroy(data + i);
+      if (data != nullptr)
+      {
+         alloc.destroy(data + i);
+      }
    }
    if (numCapacity)
    {
