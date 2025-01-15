@@ -266,7 +266,7 @@ vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), n
 template <typename T, typename A>
 vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs.numElements), numElements(rhs.numElements)
 {
-   if (rhs.numElements > 0)
+   if (rhs.empty())
    {
       data = alloc.allocate(rhs.numElements);
       for (int i = 0; i < numElements; i++)
@@ -303,15 +303,18 @@ template <typename T, typename A>
 vector <T, A> :: ~vector()
 {
    //Loop through elements and destroy them each
-   //for (size_t i = 0; i < numElements; ++i)
-   //{
-   //   alloc.destroy(data + i);
-   //}
-   //if (numCapacity)
-   //{
-   //   //If the vector has memory deallocate the memory that the vector had.
-   //   alloc.deallocate(data, numCapacity);
-   //}
+   for (size_t i = 0; i < numElements; ++i)
+   {
+      if (data != nullptr)
+      {
+         alloc.destroy(data + i);
+      }
+   }
+   if (numCapacity)
+   {
+      //If the vector has memory deallocate the memory that the vector had.
+      alloc.deallocate(data, numCapacity);
+   }
 }
 
 /***************************************
