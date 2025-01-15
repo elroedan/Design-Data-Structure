@@ -227,20 +227,6 @@ vector <T, A> :: vector(size_t num, const T & t, const A & a): alloc(a), numCapa
 template <typename T, typename A>
 vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc(a), numCapacity(l.size()), numElements(l.size())
 {
-   /*data = alloc.allocate(l.size());
-   std::uninitialized_copy(l.begin(), l.end(), data);*/
-
-  /* data = new T[l.size()];
-   std::copy(l.begin(), l.end(), data);*/
-
-   //data = new T[l.size()];
-   ////data = alloc.allocate(l.size());
-   //auto it = l.begin();
-   //for (size_t i = 0; i < l.size(); i++)
-   //{
-   //   data[i] = (*(it + i));
-   //}
-
    data = alloc.allocate(l.size());
    auto it = l.begin();
    for (size_t i = 0; i < l.size(); ++i, ++it)
