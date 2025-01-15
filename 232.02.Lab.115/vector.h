@@ -210,13 +210,18 @@ vector <T, A> :: vector(const A & a)
  * construct each element, and copy the values over
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector(size_t num, const T & t, const A & a) 
+vector <T, A> :: vector(size_t num, const T & t, const A & a):
+                  alloc(a), numCapacity(num), numElements(num)
 {
-   data = new T[num];
-   for (size_t i = 0; i < num; i++)
+   // Allocate memory using the allocator
+   data = alloc.allocate(num);
+
+   // Use the allocator to construct each element with the value `t`
+   for (size_t i = 0; i < num; ++i)
    {
-      data[i] = t;
+       alloc.construct(data + i, t);
    }
+   
    numElements = num;
    numCapacity = num;
 }
