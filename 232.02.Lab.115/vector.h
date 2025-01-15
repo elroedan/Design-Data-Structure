@@ -257,11 +257,11 @@ vector <T, A> :: vector (const vector & rhs)
    if (rhs.numElements > 0)
    {
       data = alloc.allocate(rhs.numElements);
-      numCapacity = rhs.numCapacity;
+      numCapacity = rhs.numElements;
       numElements = rhs.numElements;
-      for (int i = 0; i > numElements; i++)
+      for (int i = 0; i < numElements; i++)
       {
-         alloc.construct(data[i], rhs.data[i]);
+         alloc.construct(data + i, rhs.data[i]);
       }
    }
    else 
