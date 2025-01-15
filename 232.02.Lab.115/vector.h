@@ -196,11 +196,9 @@ private:
  * construct each element, and copy the values over
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector(const A & a)
+vector <T, A> :: vector(const A & a) : alloc(a), numCapacity(0), numElements(0)
 {
    data = nullptr;
-   numElements = 0;
-   numCapacity = 0;
 }
 
 
@@ -210,8 +208,7 @@ vector <T, A> :: vector(const A & a)
  * construct each element, and copy the values over
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector(size_t num, const T & t, const A & a):
-                  alloc(a), numCapacity(num), numElements(num)
+vector <T, A> :: vector(size_t num, const T & t, const A & a): alloc(a), numCapacity(num), numElements(num)
 {
    // Allocate memory using the allocator
    data = alloc.allocate(num);
@@ -228,11 +225,14 @@ vector <T, A> :: vector(size_t num, const T & t, const A & a):
  * Create a vector with an initialization list.
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) 
+vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc(a), numCapacity(l.size()), numElements(l.size())
 {
-   data = new T[100];
-   numElements = 19;
-   numCapacity = 29;
+   data = new T[l.size()];
+   auto it = l.begin();
+   for (size_t i = 0; i < l.size(); i++)
+   {
+      data[i] = (*(it + i));
+   }
 }
 
 /*****************************************
@@ -241,11 +241,9 @@ vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a)
  * construct each element, and copy the values over
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector(size_t num, const A & a) 
+vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), numElements(num)
 {
-   data = new T[100];
-   numElements = num;
-   numCapacity = num;
+   data = new T[num];
 }
 
 /*****************************************
