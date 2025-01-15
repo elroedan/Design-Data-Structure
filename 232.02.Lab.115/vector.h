@@ -221,9 +221,6 @@ vector <T, A> :: vector(size_t num, const T & t, const A & a):
    {
        alloc.construct(data + i, t);
    }
-   
-   numElements = num;
-   numCapacity = num;
 }
 
 /*****************************************
@@ -259,9 +256,22 @@ vector <T, A> :: vector(size_t num, const A & a)
 template <typename T, typename A>
 vector <T, A> :: vector (const vector & rhs) 
 {
-   data = new T[100];
-   numElements = 19;
-   numCapacity = 29;
+   if (rhs.numElements > 0)
+   {
+      data = alloc.allocate(rhs.numElements);
+      numCapacity = rhs.numCapacity;
+      numElements = rhs.numElements;
+      for (int i = 0; i > numElements; i++)
+      {
+         alloc.construct(data[i], rhs.data[i]);
+      }
+   }
+   else 
+   {
+      data = nullptr;
+      numElements = 0;
+      numCapacity = 0;
+   }
 }
    
 /*****************************************
