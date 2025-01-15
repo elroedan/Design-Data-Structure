@@ -227,6 +227,12 @@ vector <T, A> :: vector(size_t num, const T & t, const A & a): alloc(a), numCapa
 template <typename T, typename A>
 vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc(a), numCapacity(l.size()), numElements(l.size())
 {
+   /*data = alloc.allocate(l.size());
+   std::uninitialized_copy(l.begin(), l.end(), data);*/
+
+  /* data = new T[l.size()];
+   std::copy(l.begin(), l.end(), data);*/
+
    data = new T[l.size()];
    auto it = l.begin();
    for (size_t i = 0; i < l.size(); i++)
@@ -243,7 +249,8 @@ vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc
 template <typename T, typename A>
 vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), numElements(num)
 {
-   data = new T[num];
+   //data = new T[num];
+   data = alloc.allocate(num);
 }
 
 /*****************************************
@@ -252,7 +259,7 @@ vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), n
  * call the copy constructor on each element
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector (const vector & rhs) 
+vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs.numCapacity), numElements(rhs.numElements)
 {
    if (rhs.numElements > 0)
    {
@@ -277,11 +284,12 @@ vector <T, A> :: vector (const vector & rhs)
  * Steal the values from the RHS and set it to zero.
  ****************************************/
 template <typename T, typename A>
-vector <T, A> :: vector (vector && rhs) 
+vector <T, A> :: vector (vector && rhs) : numCapacity(rhs.numCapacity), numElements(rhs.numElements)
 {
-   data = new T[100];
-   numElements = 19;
-   numCapacity = 29;
+   data = rhs.data;
+   rhs.data = nullptr;
+   rhs.numCapacity = 0;
+   rhs.numElements = 0;
 }
 
 /*****************************************
