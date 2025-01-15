@@ -60,6 +60,17 @@ public:
    //
    void swap(vector& rhs)
    {
+      auto tempData = rhs.data;
+      rhs.data = data;
+      data = tempData;
+
+      auto tempElements = rhs.numElements;
+      rhs.numElements = numElements;
+      numElements = tempElements;
+
+      auto tempCapacity = rhs.numCapacity;
+      rhs.numCapacity = numCapacity;
+      numCapacity = tempCapacity;
    }
    vector & operator = (const vector & rhs);
    vector & operator = (vector&& rhs);
@@ -243,8 +254,8 @@ vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc
 template <typename T, typename A>
 vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), numElements(num)
 {
-   //data = new T[num];
-   data = alloc.allocate(num);
+   data = new T[num];
+   //data = alloc.allocate(num);
 }
 
 /*****************************************
