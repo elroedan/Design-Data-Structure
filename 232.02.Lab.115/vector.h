@@ -255,7 +255,7 @@ vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), n
 template <typename T, typename A>
 vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs.numElements), numElements(rhs.numElements)
 {
-   if (rhs.empty())
+   if (!rhs.empty())
    {
       data = alloc.allocate(rhs.numElements);
       for (int i = 0; i < numElements; i++)
