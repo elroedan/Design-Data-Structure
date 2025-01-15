@@ -292,6 +292,16 @@ vector <T, A> :: vector (vector && rhs)
 template <typename T, typename A>
 vector <T, A> :: ~vector()
 {
+   //Loop through elements and destroy them each
+   for (size_t i = 0; i < numElements; ++i)
+   {
+      alloc.destroy(data + i);
+   }
+   if (numCapacity)
+   {
+      //If the vector has memory deallocate the memory that the vector had.
+      alloc.deallocate(data, numCapacity);
+   }
 }
 
 /***************************************
