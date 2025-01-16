@@ -104,12 +104,15 @@ public:
    //
    void clear()
    {
+      //Remove all the elements and reset the whole thing
       for (size_t i = 0; i < numElements; ++i)
          alloc.destroy(data + i);
       numElements = 0;
    }
+   
    void pop_back()
    {
+      //If it's not empty then remove the last element
       if (!empty())
       {
          alloc.destroy(data + (numElements - 1));
@@ -347,9 +350,12 @@ void vector <T, A> :: resize(size_t newElements)
 template <typename T, typename A>
 void vector <T, A> :: resize(size_t newElements, const T & t)
 {
+   //Sesired size is smaller than current so destroy thos old slots
    if (newElements < numElements)
       for (size_t i = newElements; i < numElements; i++)
          alloc.destroy(data + i);
+   
+   //New size is made and any extra spots are filled with t
    else if (newElements > numElements)
    {
       if (newElements > numCapacity)
@@ -371,11 +377,16 @@ void vector <T, A> :: resize(size_t newElements, const T & t)
 template <typename T, typename A>
 void vector <T, A> :: reserve(size_t newCapacity)
 {
+   //Already have enough space
    if (newCapacity <= numCapacity)
       return;
+   
+   //Make new space as needed and move elements
    T * dataNew = alloc.allocate(newCapacity);
    for (auto i = 0; i < numElements; i++) 
       new ((void*)(dataNew + i)) T(std::move(data[i]));
+   
+   //Destroy old elements after move is complete
    for (size_t i = 0; i < numElements; ++i)
       alloc.destroy(data + i);
    alloc.deallocate(data, numCapacity);
@@ -392,9 +403,11 @@ void vector <T, A> :: reserve(size_t newCapacity)
 template <typename T, typename A>
 void vector <T, A> :: shrink_to_fit()
 {
+   //Vector is already correct size
    if (numElements == numCapacity)
       return; 
 
+   
    T * dataNew = alloc.allocate(numElements);
 
    for (size_t i = 0; i < numElements; i++)
@@ -482,8 +495,10 @@ const T & vector <T, A> :: back() const
 template <typename T, typename A>
 void vector <T, A> :: push_back (const T & t)
 {
+   //Our vector was empty so make a single spot
    if (capacity() == 0)
       reserve(1);
+   //Double the size if needed and put our element in
    if (size() == capacity())
       reserve(capacity() * 2);
    new ((void*)(&data[numElements++])) T(t);
@@ -492,8 +507,10 @@ void vector <T, A> :: push_back (const T & t)
 template <typename T, typename A>
 void vector <T, A> ::push_back(T && t)
 {
+   //Our vector was empty so make a single spot
    if (capacity() == 0)
       reserve(1);
+   //Double the size if needed and put our element in
    if (size() == capacity())
       reserve(capacity() * 2);
    new ((void*)(&data[numElements++])) T(std::move(t));
@@ -509,9 +526,12 @@ void vector <T, A> ::push_back(T && t)
 template <typename T, typename A>
 vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
 {
+   //Vectors are the same size, just move data
    if (rhs.size() == size())
       for (size_t i = 0; i < size(); i++)
          data[i] = rhs.data[i];
+   
+   //Our Source is bigger than the destination but our dest has room
    else if (rhs.size() > size())
    {
       if (rhs.size() <= capacity())
@@ -521,6 +541,8 @@ vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
          for (size_t i = size(); i < rhs.size(); i++)
             alloc.construct(data + i, rhs.data[i]);
       }
+      
+      //Our source is bigger than dest so adjust the dest
       else
       {
          T * dataNew = alloc.allocate(rhs.size());
@@ -532,28 +554,34 @@ vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
          numCapacity = rhs.size();
       }
    }
+   
+   //The dest is bigger so move the data and take down the
    else
    {
       for (size_t i = 0; i < rhs.size(); i++)
          data[i] = rhs.data[i];
+      //Destroy the extra elements left over in dest
       for (size_t i = rhs.size(); i < size(); i++)
          alloc.destroy(data + i);
    }
 
    numElements = rhs.size();
-
    return *this;
 }
 template <typename T, typename A>
 vector <T, A>& vector <T, A> :: operator = (vector&& rhs)
 {
+   //If they are the same vector, do nothing
    if (this == &rhs)
       return *this;
    this->clear();
    //data = std::move(rhs.data); // Ask Bro. Helfrich about using this 
+   //Set our current vector to have the right data/information
    data = rhs.data;
    this->numElements = rhs.numElements;
    this->numCapacity = rhs.numCapacity;
+   
+   //Take down our old/source vector
    rhs.data = nullptr;
    rhs.numElements = 0;
    rhs.numCapacity = 0;
