@@ -110,8 +110,11 @@ public:
    }
    void pop_back()
    {
-      //alloc.destroy(data + (numElements - 1));
-      //numElements -= 1;
+      if (!empty())
+      {
+         alloc.destroy(data + (numElements - 1));
+         numElements -= 1;
+      }
    }
    void shrink_to_fit();
 
@@ -310,10 +313,6 @@ template <typename T, typename A>
 vector <T, A> :: ~vector()
 {
    //Loop through elements and destroy them each
-   /*for (size_t i = 0; i < numElements; ++i)
-   {
-      alloc.destroy(data + i);
-   }*/
    clear();
    if (numCapacity)
    {
@@ -332,13 +331,33 @@ vector <T, A> :: ~vector()
 template <typename T, typename A>
 void vector <T, A> :: resize(size_t newElements)
 {
-   numElements = 3;
+   if (newElements < numElements)
+      for (size_t i = newElements; i < numElements; i++)
+         alloc.destroy(data + i);
+   else if (newElements > numElements)
+   {
+      if (newElements > numCapacity)
+         reserve(newElements);
+      for (size_t i = numElements; i < newElements; i++)
+         new (&data[i]) T;
+   }
+   numElements = newElements;
 }
 
 template <typename T, typename A>
 void vector <T, A> :: resize(size_t newElements, const T & t)
 {
-   numElements = 3;
+   if (newElements < numElements)
+      for (size_t i = newElements; i < numElements; i++)
+         alloc.destroy(data + i);
+   else if (newElements > numElements)
+   {
+      if (newElements > numCapacity)
+         reserve(newElements);
+      for (size_t i = numElements; i < newElements; i++)
+         new (&data[i]) T(t);
+   }
+   numElements = newElements;
 }
 
 /***************************************
@@ -467,7 +486,7 @@ void vector <T, A> :: push_back (const T & t)
       reserve(1);
    if (size() == capacity())
       reserve(capacity() * 2);
-   data[numElements++] = t;
+   new ((void*)(&data[numElements++])) T(t);
 }
 
 template <typename T, typename A>
@@ -477,7 +496,7 @@ void vector <T, A> ::push_back(T && t)
       reserve(1);
    if (size() == capacity())
       reserve(capacity() * 2);
-   data[numElements++] = t;
+   new ((void*)(&data[numElements++])) T(std::move(t));
 }
 
 /***************************************
@@ -490,7 +509,7 @@ void vector <T, A> ::push_back(T && t)
 template <typename T, typename A>
 vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
 {
-   /*if (rhs.size() == size())
+   if (rhs.size() == size())
       for (size_t i = 0; i < size(); i++)
          data[i] = rhs.data[i];
    else if (rhs.size() > size())
@@ -500,15 +519,15 @@ vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
          for (size_t i = 0; i < size(); i++)
             data[i] = rhs.data[i];
          for (size_t i = size(); i < rhs.size(); i++)
-            alloc.construct(data[i], rhs.data[i]);
+            alloc.construct(data + i, rhs.data[i]);
       }
       else
       {
          T * dataNew = alloc.allocate(rhs.size());
          for (size_t i = 0; i < rhs.size(); i++)
-            alloc.construct(dataNew[i], rhs.data[i]);
+            alloc.construct(dataNew + i, rhs.data[i]);
          clear();
-         alloc.deallocate(data);
+         alloc.deallocate(data, numCapacity);
          data = dataNew;
          numCapacity = rhs.size();
       }
@@ -518,8 +537,8 @@ vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
       for (size_t i = 0; i < rhs.size(); i++)
          data[i] = rhs.data[i];
       for (size_t i = rhs.size(); i < size(); i++)
-         alloc.destroy(data[i]);
-   }*/
+         alloc.destroy(data + i);
+   }
 
    numElements = rhs.size();
 
@@ -528,7 +547,16 @@ vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
 template <typename T, typename A>
 vector <T, A>& vector <T, A> :: operator = (vector&& rhs)
 {
-
+   if (this == &rhs)
+      return *this;
+   this->clear();
+   //data = std::move(rhs.data); // Ask Bro. Helfrich about using this 
+   data = rhs.data;
+   this->numElements = rhs.numElements;
+   this->numCapacity = rhs.numCapacity;
+   rhs.data = nullptr;
+   rhs.numElements = 0;
+   rhs.numCapacity = 0;
    return *this;
 }
 
