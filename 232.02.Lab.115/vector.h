@@ -118,9 +118,9 @@ public:
    //
    // Status
    //
-   size_t  size()          const { return numElements;      }
-   size_t  capacity()      const { return numCapacity;      }
-   bool empty()            const { return /*begin() == end();*/ numElements == 0; }
+   size_t  size()          const { return numElements;}
+   size_t  capacity()      const { return numCapacity;}
+   bool empty()            const { return numElements == 0;}
   
 private:
    
@@ -273,7 +273,7 @@ vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), n
 template <typename T, typename A>
 vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs.numElements), numElements(rhs.numElements)
 {
-   if (rhs.numElements > 0)
+   if (!rhs.empty())
    {
       data = alloc.allocate(rhs.numElements);
       for (int i = 0; i < numElements; i++)
