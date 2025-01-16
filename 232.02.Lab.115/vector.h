@@ -332,11 +332,16 @@ vector <T, A> :: ~vector()
  *     OUTPUT :
  **************************************/
 template <typename T, typename A>
-void vector <T, A> :: resize(size_t newElements)
+void vector <T, A> :: resize(size_t newElements)//HELPPPP US IT"S NOT EFFICIENT
 {
+   //Sesired size is smaller than current so destroy thos old slots
    if (newElements < numElements)
+   {
       for (size_t i = newElements; i < numElements; i++)
          alloc.destroy(data + i);
+   }
+   
+   //New size/position is made
    else if (newElements > numElements)
    {
       if (newElements > numCapacity)
@@ -344,7 +349,12 @@ void vector <T, A> :: resize(size_t newElements)
       for (size_t i = numElements; i < newElements; i++)
          new (&data[i]) T;
    }
-   numElements = newElements;
+   
+   //Only change the number of elements if needed
+   if (numElements != newElements)
+   {
+      numElements = newElements;
+   }
 }
 
 template <typename T, typename A>
@@ -403,22 +413,36 @@ void vector <T, A> :: reserve(size_t newCapacity)
 template <typename T, typename A>
 void vector <T, A> :: shrink_to_fit()
 {
-   //Vector is already correct size
-   if (numElements == numCapacity)
-      return; 
+   if (numElements != 0)
+   {
+      //Vector is already correct size
+      if (numElements == numCapacity)
+         return;
 
-   //Allocate new spot for smaller
-   T * dataNew = alloc.allocate(numElements);
+      //Allocate new spot for smaller vector
+      T * dataNew = alloc.allocate(numElements);
 
-   for (size_t i = 0; i < numElements; i++)
-      alloc.construct(&dataNew[i], data[i]);
+      //Create our vector in the new spot
+      for (size_t i = 0; i < numElements; i++)
+         alloc.construct(&dataNew[i], data[i]);
 
-   for (size_t i = 0; i < numElements; ++i)
-      alloc.destroy(&data[i]);
-   alloc.deallocate(data, numCapacity);
+      //Destroy the vector in the old spot
+      for (size_t i = 0; i < numElements; ++i)
+         alloc.destroy(&data[i]);
+      alloc.deallocate(data, numCapacity);
 
-   data = dataNew;
-   numCapacity = numElements;
+      //Update members
+      data = dataNew;
+      numCapacity = numElements;
+   }
+   else
+   {
+      //There are no elements, but we need to free the memory
+      alloc.deallocate(data, numCapacity);
+      data = nullptr;
+      numCapacity = 0;
+   }
+
 }
 
 
