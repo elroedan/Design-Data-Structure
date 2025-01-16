@@ -407,7 +407,7 @@ void vector <T, A> :: shrink_to_fit()
    if (numElements == numCapacity)
       return; 
 
-   
+   //Allocate new spot for smaller
    T * dataNew = alloc.allocate(numElements);
 
    for (size_t i = 0; i < numElements; i++)
@@ -569,22 +569,20 @@ vector <T, A> & vector <T, A> :: operator = (const vector & rhs)
    return *this;
 }
 template <typename T, typename A>
-vector <T, A>& vector <T, A> :: operator = (vector&& rhs)
+vector <T, A>& vector <T, A> :: operator = (vector&& rhs)//change the 
 {
    //If they are the same vector, do nothing
    if (this == &rhs)
       return *this;
-   this->clear();
-   //data = std::move(rhs.data); // Ask Bro. Helfrich about using this 
-   //Set our current vector to have the right data/information
-   data = rhs.data;
-   this->numElements = rhs.numElements;
-   this->numCapacity = rhs.numCapacity;
    
-   //Take down our old/source vector
-   rhs.data = nullptr;
-   rhs.numElements = 0;
-   rhs.numCapacity = 0;
+   //Set our current/lhs vector to be default
+   this->clear();
+   this->data = nullptr;
+   this->numElements = 0;
+   this->numCapacity = 0;
+   
+   //Swap the vectors
+   this->swap(rhs);
    return *this;
 }
 
