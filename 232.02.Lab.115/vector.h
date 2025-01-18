@@ -238,9 +238,8 @@ vector <T, A> :: vector(size_t num, const T & t, const A & a): alloc(a), numCapa
 
    // Use the allocator to construct each element with the value `t`
    for (size_t i = 0; i < num; ++i)
-   {
        alloc.construct(data + i, t);
-   }
+   
 }
 
 /*****************************************
@@ -250,12 +249,14 @@ vector <T, A> :: vector(size_t num, const T & t, const A & a): alloc(a), numCapa
 template <typename T, typename A>
 vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc(a), numCapacity(l.size()), numElements(l.size())
 {
+   // Allocate memory for the elements
    data = alloc.allocate(l.size());
+
+   // Copy elements from the initializer list to the vector
    auto it = l.begin();
    for (size_t i = 0; i < l.size(); ++i, ++it)
-   {
       new (data + i) T(*it); 
-   }
+   
 }
 
 /*****************************************
@@ -266,11 +267,11 @@ vector <T, A> :: vector(const std::initializer_list<T> & l, const A & a) : alloc
 template <typename T, typename A>
 vector <T, A> :: vector(size_t num, const A & a) : alloc(a), numCapacity(num), numElements(num)
 {
+   // Allocate memory if num > 0, otherwise set data to nullptr
    if (num > 0)
       data = new T[num];
    else
       data = nullptr;
-   //data = alloc.allocate(num);
 }
 
 /*****************************************
@@ -283,14 +284,15 @@ vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs
 {
    if (!rhs.empty())
    {
+      // Allocate memory and copy elements from rhs
       data = alloc.allocate(rhs.numElements);
       for (int i = 0; i < numElements; i++)
-      {
          alloc.construct(data + i, rhs.data[i]);
-      }
+      
    }
    else 
    {
+      // Set data to nullptr if rhs is empty
       data = nullptr;
       numElements = 0;
       numCapacity = 0;
@@ -304,6 +306,7 @@ vector <T, A> :: vector (const vector & rhs) : alloc(rhs.alloc), numCapacity(rhs
 template <typename T, typename A>
 vector <T, A> :: vector (vector && rhs) : numCapacity(rhs.numCapacity), numElements(rhs.numElements), data(rhs.data)
 {
+   // Set rhss data to nullptr is empty
    rhs.data = nullptr;
    rhs.numCapacity = 0;
    rhs.numElements = 0;
@@ -446,8 +449,6 @@ void vector <T, A> :: shrink_to_fit()
    }
 
 }
-
-
 
 /*****************************************
  * VECTOR :: SUBSCRIPT
