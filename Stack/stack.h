@@ -44,10 +44,10 @@ public:
    
    stack() : container()         {  }
    stack(const stack <T> &  rhs) : container(rhs.container) { }
-   stack(stack <T>&& rhs)        : container(rhs.container) { }
-   stack(const Container& rhs) { container = rhs.container; }
-   stack(Container&& rhs) { container = move(rhs.container); }
-   ~stack()                      {                      }     
+   stack(stack <T>&& rhs)        : container(std::move(rhs.container)) { }
+   stack(const Container& rhs) :container(rhs){  }
+   stack(Container&& rhs) :container(std::move(rhs)){  }
+   ~stack()                      {                      }
    
    //
    // Assign
@@ -84,7 +84,7 @@ public:
    
    void push(const T &  t) 
    {  
-   
+      this->container.push_back(t);
    }
    void push(      T && t) 
    {  
