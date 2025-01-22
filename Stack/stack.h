@@ -45,24 +45,27 @@ public:
    stack() : container()         {  }
    stack(const stack <T> &  rhs) : container(rhs.container) { }
    stack(stack <T>&& rhs)        : container(std::move(rhs.container)) { }
-   stack(const Container& rhs) :container(rhs){  }
-   stack(Container&& rhs) :container(std::move(rhs)){  }
-   ~stack()                      {                      }
+
+   stack(const Container& rhs)   : container(rhs)           { }
+   stack(Container&& rhs)        : container(std::move(rhs)) { }
+   ~stack()                      {                      }     
    
    //
    // Assign
    //
    stack <T> & operator = (const stack <T> & rhs)
    {
+      this->container = rhs.container;
       return *this;
    }
    stack <T>& operator = (stack <T> && rhs)
    {
+      this->container = std::move(rhs.container);
       return *this;
    }
    void swap(stack <T>& rhs)
    {
-
+      std::swap(container, rhs.container);
    }
 
    //
@@ -71,11 +74,11 @@ public:
    
    T & top()       
    { 
-      return *(new T); 
+      return (container.back()); 
    }
    const T & top() const 
    { 
-      return *(new T); 
+      return *(container.back());  // Talk to Helfrich why it works both refrenced and deferenced.
    }
 
    //
@@ -85,10 +88,11 @@ public:
    void push(const T &  t) 
    {  
       this->container.push_back(t);
+
    }
    void push(      T && t) 
    {  
-   
+      this->container.push_back(std::move(t));
    }
 
    //
@@ -97,7 +101,7 @@ public:
    
    void pop() 
    {  
-   
+      this->container.pop_back();
    }
 
    //
