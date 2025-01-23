@@ -42,13 +42,12 @@ public:
    // Construct
    //
    
-   stack() : container()         {  }
-   stack(const stack <T> &  rhs) : container(rhs.container)            { }
-   stack(stack <T>&& rhs)        : container(std::move(rhs.container)) { }
-
-   stack(const Container& rhs)   : container(rhs)           { }
-   stack(Container&& rhs)        : container(std::move(rhs)) { }
-   ~stack()                      {                      }     
+   stack()                      : container(                        ) { }
+   stack(const stack <T>&  rhs) : container(          rhs.container ) { }
+   stack(      stack <T>&& rhs) : container(std::move(rhs.container)) { }
+   stack(const Container&  rhs) : container(          rhs           ) { }
+   stack(      Container&& rhs) : container(std::move(rhs          )) { }
+   ~stack()                                                           { }     
    
    //
    // Assign
@@ -74,11 +73,17 @@ public:
    
    T & top()       
    { 
-      return (container.back()); 
+      // Is the stack empty? 
+      /*if (!empty())
+         return container.back();*/
+      return container.back();
    }
    const T & top() const 
    { 
-      return *(container.back());  // Talk to Helfrich why it works both refrenced and deferenced.
+      // Is the stack empty? 
+      /*if (!empty())
+         return container.back();*/ 
+      return container.back();
    }
 
    //
@@ -88,7 +93,6 @@ public:
    void push(const T &  t) 
    {  
       this->container.push_back(t);
-
    }
    void push(      T && t) 
    {  
@@ -109,11 +113,10 @@ public:
    // Status
    //
    
-   size_t size () const { return container.size();   }
-   bool   empty() const { return container.empty(); } // 
+   size_t size () const { return container.size();  }
+   bool   empty() const { return container.empty(); }  
    
 private:
-   
    Container container;  // underlying container (probably a vector)
 };
 

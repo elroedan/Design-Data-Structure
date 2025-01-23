@@ -66,6 +66,7 @@ public:
       // Access
       test_top_readOne();
       test_top_readStandard();
+      //test_top_readEmpty();
       test_top_writeOne();
       test_top_writeStandard();
 
@@ -1194,6 +1195,38 @@ public:
       // teardown
       teardownStandardFixture(s);
    }
+
+   // attempt to read an element in an empty stack
+   //void test_top_readEmpty()
+   //{  // setup
+   //   //    +----+----+----+----+
+   //   //    |    |    |    |    |
+   //   //    +----+----+----+----+
+   //   custom::stack<Spy> s;
+   //   Spy value;
+   //   Spy::reset();
+   //   // exercise
+   //   value = s.top();
+   //   // verify
+   //   assertUnit(Spy::numAssign() == 0);
+   //   assertUnit(Spy::numCopy() == 0);
+   //   assertUnit(Spy::numAlloc() == 0);
+   //   assertUnit(Spy::numDelete() == 0);
+   //   assertUnit(Spy::numDefault() == 0);
+   //   assertUnit(Spy::numNondefault() == 0);
+   //   assertUnit(Spy::numCopyMove() == 0);
+   //   assertUnit(Spy::numAssignMove() == 0);
+   //   assertUnit(Spy::numDestructor() == 0);
+   //   //    +----+
+   //   //    |    |
+   //   //    +----+
+   //   assertUnit(s.container.size() == 0);
+   //   assertUnit(s.container.capacity() == 0);
+   //   assertEmptyFixture(s);
+   //   //assertUnit(value == Spy(26));
+   //   // teardown
+   //   teardownStandardFixture(s);
+   //}
 
    // when there is one element in the stack, write to it
    void test_top_writeOne()

@@ -49,12 +49,12 @@ namespace custom
       //
       // Construct
       //
-      vector(const A& a = A());
-      vector(size_t numElements, const A& a = A());
-      vector(size_t numElements, const T& t, const A& a = A());
+      vector(                                   const A& a = A());
+      vector(size_t numElements,                const A& a = A());
+      vector(size_t numElements, const T& t,    const A& a = A());
       vector(const std::initializer_list<T>& l, const A& a = A());
-      vector(const vector& rhs);
-      vector(vector&& rhs);
+      vector(const vector&  rhs);
+      vector(      vector&& rhs);
       ~vector();
 
       //
@@ -66,8 +66,8 @@ namespace custom
          std::swap(numElements, rhs.numElements);
          std::swap(numCapacity, rhs.numCapacity);
       }
-      vector& operator = (const vector& rhs);
-      vector& operator = (vector&& rhs);
+      vector& operator = (const vector&  rhs);
+      vector& operator = (      vector&& rhs);
 
       //
       // Iterator
@@ -85,28 +85,28 @@ namespace custom
       //
       // Access
       //
-      T& operator [] (size_t index);
+            T& operator [] (size_t index);
       const T& operator [] (size_t index) const;
-      T& front();
+            T& front();
       const T& front() const;
-      T& back();
-      const T& back() const;
+            T& back ();
+      const T& back () const;
 
       //
       // Insert
       //
-      void push_back(const T& t);
-      void push_back(T&& t);
+      void push_back(const T&  t);
+      void push_back(      T&& t);
       void reserve(size_t newCapacity);
-      void resize(size_t newElements);
-      void resize(size_t newElements, const T& t);
+      void resize( size_t newElements);
+      void resize( size_t newElements, const T& t);
 
       //
       // Remove
       //
       void clear()
       {
-         //Remove all the elements and reset the whole thing
+         // Remove all the elements and reset the whole thing
          for (size_t i = 0; i < numElements; ++i)
             alloc.destroy(data + i);
          numElements = 0;
@@ -114,7 +114,7 @@ namespace custom
 
       void pop_back()
       {
-         //If it's not empty then remove the last element
+         // If it's not empty then remove the last element
          if (!empty())
          {
             alloc.destroy(data + (numElements - 1));
@@ -128,12 +128,12 @@ namespace custom
       //
       size_t  size()          const { return numElements; }
       size_t  capacity()      const { return numCapacity; }
-      bool empty()            const { return numElements == 0; }
+      bool empty()            const { return size() == 0; }
 
    private:
 
       A    alloc;                // use allocator for memory allocation
-      T* data;                 // user data, a dynamically-allocated array
+      T* data;                   // user data, a dynamically-allocated array
       size_t  numCapacity;       // the capacity of the array
       size_t  numElements;       // the number of items currently used
    };
@@ -158,10 +158,10 @@ namespace custom
       friend class ::TestHash;
    public:
       // constructors, destructors, and assignment operator
-      iterator() : p(nullptr) {  }
-      iterator(T* p) : p(p) {  }
-      iterator(const iterator& rhs) : p(rhs.p) {  }
-      iterator(size_t index, vector<T>& v) : p(v.data + index) {  }
+      iterator()                           : p(nullptr)        { }
+      iterator(T* p)                       : p(p)              { }
+      iterator(const iterator& rhs)        : p(rhs.p)          { }
+      iterator(size_t index, vector<T>& v) : p(v.data + index) { }
       iterator& operator = (const iterator& rhs)
       {
          this->p = rhs.p;
@@ -320,11 +320,11 @@ namespace custom
    template <typename T, typename A>
    vector <T, A> :: ~vector()
    {
-      //Loop through elements and destroy them each
+      // Loop through elements and destroy them each
       clear();
       if (numCapacity)
       {
-         //If the vector has memory deallocate the memory that the vector had.
+         // If the vector has memory deallocate the memory that the vector had.
          alloc.deallocate(data, numCapacity);
       }
    }
@@ -339,14 +339,14 @@ namespace custom
    template <typename T, typename A>
    void vector <T, A> ::resize(size_t newElements)//HELPPPP US IT"S NOT EFFICIENT
    {
-      //Sesired size is smaller than current so destroy thos old slots
+      // Sesired size is smaller than current so destroy thos old slots
       if (newElements < numElements)
       {
          for (size_t i = newElements; i < numElements; i++)
             alloc.destroy(data + i);
       }
 
-      //New size/position is made
+      // New size/position is made
       else if (newElements > numElements)
       {
          if (newElements > numCapacity)
@@ -355,7 +355,7 @@ namespace custom
             new (&data[i]) T;
       }
 
-      //Only change the number of elements if needed
+      // Only change the number of elements if needed
       if (numElements != newElements)
       {
          numElements = newElements;
@@ -365,12 +365,12 @@ namespace custom
    template <typename T, typename A>
    void vector <T, A> ::resize(size_t newElements, const T& t)
    {
-      //Sesired size is smaller than current so destroy thos old slots
+      // Desired size is smaller than current so destroy the old slots
       if (newElements < numElements)
          for (size_t i = newElements; i < numElements; i++)
             alloc.destroy(data + i);
 
-      //New size is made and any extra spots are filled with t
+      // New size is made and any extra spots are filled with t
       else if (newElements > numElements)
       {
          if (newElements > numCapacity)
@@ -392,16 +392,16 @@ namespace custom
    template <typename T, typename A>
    void vector <T, A> ::reserve(size_t newCapacity)
    {
-      //Already have enough space
+      // Already have enough space
       if (newCapacity <= numCapacity)
          return;
 
-      //Make new space as needed and move elements
+      // Make new space as needed and move elements
       T* dataNew = alloc.allocate(newCapacity);
       for (auto i = 0; i < numElements; i++)
          new ((void*)(dataNew + i)) T(std::move(data[i]));
 
-      //Destroy old elements after move is complete
+      // Destroy old elements after move is complete
       for (size_t i = 0; i < numElements; ++i)
          alloc.destroy(data + i);
       alloc.deallocate(data, numCapacity);
@@ -420,29 +420,29 @@ namespace custom
    {
       if (numElements != 0)
       {
-         //Vector is already correct size
+         // Vector is already correct size
          if (numElements == numCapacity)
             return;
 
-         //Allocate new spot for smaller vector
+         // Allocate new spot for smaller vector
          T* dataNew = alloc.allocate(numElements);
 
-         //Create our vector in the new spot
+         // Create our vector in the new spot
          for (size_t i = 0; i < numElements; i++)
             alloc.construct(&dataNew[i], data[i]);
 
-         //Destroy the vector in the old spot
+         // Destroy the vector in the old spot
          for (size_t i = 0; i < numElements; ++i)
             alloc.destroy(&data[i]);
          alloc.deallocate(data, numCapacity);
 
-         //Update members
+         // Update members
          data = dataNew;
          numCapacity = numElements;
       }
       else
       {
-         //There are no elements, but we need to free the memory
+         // There are no elements, but we need to free the memory
          alloc.deallocate(data, numCapacity);
          data = nullptr;
          numCapacity = 0;
@@ -492,7 +492,7 @@ namespace custom
    }
 
    /*****************************************
-    * VECTOR :: FRONT
+    * VECTOR :: BACK
     * Read-Write access
     ****************************************/
    template <typename T, typename A>
@@ -502,7 +502,7 @@ namespace custom
    }
 
    /******************************************
-    * VECTOR :: FRONT
+    * VECTOR :: BACK
     * Read-Write access
     *****************************************/
    template <typename T, typename A>
@@ -522,10 +522,10 @@ namespace custom
    template <typename T, typename A>
    void vector <T, A> ::push_back(const T& t)
    {
-      //Our vector was empty so make a single spot
+      // Our vector was empty so make a single spot
       if (capacity() == 0)
          reserve(1);
-      //Double the size if needed and put our element in
+      // Double the size if needed and put our element in
       if (size() == capacity())
          reserve(capacity() * 2);
       new ((void*)(&data[numElements++])) T(t);
@@ -534,10 +534,10 @@ namespace custom
    template <typename T, typename A>
    void vector <T, A> ::push_back(T&& t)
    {
-      //Our vector was empty so make a single spot
+      // Our vector was empty so make a single spot
       if (capacity() == 0)
          reserve(1);
-      //Double the size if needed and put our element in
+      // Double the size if needed and put our element in
       if (size() == capacity())
          reserve(capacity() * 2);
       new ((void*)(&data[numElements++])) T(std::move(t));
@@ -553,12 +553,12 @@ namespace custom
    template <typename T, typename A>
    vector <T, A>& vector <T, A> :: operator = (const vector& rhs)
    {
-      //Vectors are the same size, just move data
+      // Vectors are the same size, just move data
       if (rhs.size() == size())
          for (size_t i = 0; i < size(); i++)
             data[i] = rhs.data[i];
 
-      //Our Source is bigger than the destination but our dest has room
+      // Our Source is bigger than the destination but our dest has room
       else if (rhs.size() > size())
       {
          if (rhs.size() <= capacity())
@@ -569,7 +569,7 @@ namespace custom
                alloc.construct(data + i, rhs.data[i]);
          }
 
-         //Our source is bigger than dest so adjust the dest
+         // Our source is bigger than dest so adjust the dest
          else
          {
             T* dataNew = alloc.allocate(rhs.size());
@@ -582,12 +582,12 @@ namespace custom
          }
       }
 
-      //The dest is bigger so move the data and take down the
+      // The dest is bigger so move the data and take down the
       else
       {
          for (size_t i = 0; i < rhs.size(); i++)
             data[i] = rhs.data[i];
-         //Destroy the extra elements left over in dest
+         // Destroy the extra elements left over in dest
          for (size_t i = rhs.size(); i < size(); i++)
             alloc.destroy(data + i);
       }
@@ -596,19 +596,19 @@ namespace custom
       return *this;
    }
    template <typename T, typename A>
-   vector <T, A>& vector <T, A> :: operator = (vector&& rhs)//change the 
+   vector <T, A>& vector <T, A> :: operator = (vector&& rhs) 
    {
-      //If they are the same vector, do nothing
+      // If they are the same vector, do nothing
       if (this == &rhs)
          return *this;
 
-      //Set our current/lhs vector to be default
+      // Set our current/lhs vector to be default
       this->clear();
       this->data = nullptr;
       this->numElements = 0;
       this->numCapacity = 0;
 
-      //Swap the vectors
+      // Swap the vectors
       this->swap(rhs);
       return *this;
    }
