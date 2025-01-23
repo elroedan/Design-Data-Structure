@@ -78,8 +78,10 @@ public:
       test_pushMove_standardList();
 
       // Delete
-
-
+      test_pop_emptyList();
+      test_pop_one();
+      test_pop_tooMany();
+      
       // Status
       test_size_empty();
       test_size_standard();
@@ -1496,9 +1498,108 @@ public:
    /***************************************
     * POP
     ***************************************/
+   // try to remove from empty stck
+   void test_pop_emptyList()
+   {  // setup
+      //    +----+----+----+----+
+      //    |    |    |    |    |
+      //    +----+----+----+----+
+      custom::stack<Spy> s;
+      Spy::reset();
+      // exercise
+      s.pop();
+      // verify
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numAlloc() == 0);
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numDelete() == 0);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 0);
+      assertUnit(s.empty());
+      //    +----+----+----+----+
+      //    |    |    |    |    |
+      //    +----+----+----+----+
+      assertUnit(s.container.size() == 0);
+      // teardown
+      s.container.clear();
+   }
 
+   // remove one element from stck
+   void test_pop_one()
+   {  // setup
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    | 26 | 49 | 67 | 89 |
+      //    +----+----+----+----+
+      custom::stack<Spy> s;
+      setupStandardFixture(s);
+      Spy::reset();
+      // exercise
+      s.pop();
+      // verify
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numAlloc() == 0);
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numDelete() == 1);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 1);
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    | 26 | 49 | 67 |    |
+      //    +----+----+----+----+
+      assertUnit(s.container.size() == 3);
+      if (s.container.size() < 4)
+      {
+         assertUnit(s.container[0] == Spy(26));
+         assertUnit(s.container[1] == Spy(49));
+         assertUnit(s.container[2] == Spy(67));
+      }
 
+      // teardown
+      teardownStandardFixture(s);
+   }
    
+   // remove elements until there's none left then one more
+   void test_pop_tooMany()
+   {  // setup
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    | 26 | 49 | 67 | 89 |
+      //    +----+----+----+----+
+      custom::stack<Spy> s;
+      setupStandardFixture(s);
+      Spy::reset();
+      // exercise
+      s.pop();
+      s.pop();
+      s.pop();
+      s.pop();
+      s.pop();
+      // verify
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numAlloc() == 0);
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numDelete() == 4);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 4);
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    |    |    |    |    |
+      //    +----+----+----+----+
+      assertUnit(s.container.size() == 0);
+
+      // teardown
+      teardownStandardFixture(s);
+   }
    /*************************************************************
     * SETUP STANDARD FIXTURE
     *      0    1    2    3

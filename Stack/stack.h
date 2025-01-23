@@ -43,7 +43,7 @@ public:
    //
    
    stack() : container()         {  }
-   stack(const stack <T> &  rhs) : container(rhs.container) { }
+   stack(const stack <T> &  rhs) : container(rhs.container)            { }
    stack(stack <T>&& rhs)        : container(std::move(rhs.container)) { }
 
    stack(const Container& rhs)   : container(rhs)           { }
@@ -100,8 +100,9 @@ public:
    //
    
    void pop() 
-   {  
-      this->container.pop_back();
+   {
+      if (!empty())
+         this->container.pop_back();
    }
 
    //
