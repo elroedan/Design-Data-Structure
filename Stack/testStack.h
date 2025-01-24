@@ -66,7 +66,6 @@ public:
       // Access
       test_top_readOne();
       test_top_readStandard();
-      //test_top_readEmpty();
       test_top_writeOne();
       test_top_writeStandard();
 
@@ -82,6 +81,9 @@ public:
       test_pop_emptyList();
       test_pop_one();
       test_pop_tooMany();
+      test_pop_allElements_maintainOrderAndSize();
+      test_pop_stackSize();
+      test_pop_maintainsOrder();
       
       // Status
       test_size_empty();
@@ -1196,38 +1198,6 @@ public:
       teardownStandardFixture(s);
    }
 
-   // attempt to read an element in an empty stack
-   //void test_top_readEmpty()
-   //{  // setup
-   //   //    +----+----+----+----+
-   //   //    |    |    |    |    |
-   //   //    +----+----+----+----+
-   //   custom::stack<Spy> s;
-   //   Spy value;
-   //   Spy::reset();
-   //   // exercise
-   //   value = s.top();
-   //   // verify
-   //   assertUnit(Spy::numAssign() == 0);
-   //   assertUnit(Spy::numCopy() == 0);
-   //   assertUnit(Spy::numAlloc() == 0);
-   //   assertUnit(Spy::numDelete() == 0);
-   //   assertUnit(Spy::numDefault() == 0);
-   //   assertUnit(Spy::numNondefault() == 0);
-   //   assertUnit(Spy::numCopyMove() == 0);
-   //   assertUnit(Spy::numAssignMove() == 0);
-   //   assertUnit(Spy::numDestructor() == 0);
-   //   //    +----+
-   //   //    |    |
-   //   //    +----+
-   //   assertUnit(s.container.size() == 0);
-   //   assertUnit(s.container.capacity() == 0);
-   //   assertEmptyFixture(s);
-   //   //assertUnit(value == Spy(26));
-   //   // teardown
-   //   teardownStandardFixture(s);
-   //}
-
    // when there is one element in the stack, write to it
    void test_top_writeOne()
    {  // setup
@@ -1531,7 +1501,7 @@ public:
    /***************************************
     * POP
     ***************************************/
-   // try to remove from empty stck
+   // try to remove from empty stack
    void test_pop_emptyList()
    {  // setup
       //    +----+----+----+----+
@@ -1560,7 +1530,7 @@ public:
       s.container.clear();
    }
 
-   // remove one element from stck
+   // remove one element from stack
    void test_pop_one()
    {  // setup
       //      0    1    2    3
@@ -1609,11 +1579,11 @@ public:
       setupStandardFixture(s);
       Spy::reset();
       // exercise
-      s.pop();
-      s.pop();
-      s.pop();
-      s.pop();
-      s.pop();
+      s.pop(); // remove 89 
+      s.pop(); // remove 67
+      s.pop(); // remove 49 
+      s.pop(); // remove 26 
+      s.pop(); // no more elements!
       // verify
       assertUnit(Spy::numCopyMove() == 0);
       assertUnit(Spy::numCopy() == 0);
@@ -1633,6 +1603,164 @@ public:
       // teardown
       teardownStandardFixture(s);
    }
+
+   // remove all elements, ensure stack maintained order and size after each pop
+   void test_pop_allElements_maintainOrderAndSize()
+   {  // setup
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    | 26 | 49 | 67 | 89 |
+      //    +----+----+----+----+
+      custom::stack<Spy> s;
+      setupStandardFixture(s);
+      Spy value1;
+      Spy value2;
+      Spy value3;
+      Spy value4;
+      int size1;
+      int size2;
+      int size3;
+      int size4;
+      Spy::reset();
+      // exercise
+      size1  = s.container.numElements; // size is 4 elements 
+      value1 = s.container.data[3];     // top is 89
+      s.pop();                          // remove top (89) 
+      size2  = s.container.numElements; // size is 3 elements 
+      value2 = s.container.data[2];     // top is 67
+      s.pop();                          // remove top (67)
+      size3  = s.container.numElements; // size is 2 elements 
+      value3 = s.container.data[1];     // top is 49
+      s.pop();                          // remove top (49) 
+      size4  = s.container.numElements; // size is 1 element 
+      value4 = s.container.data[0];     // top is 26
+      s.pop();                          // remove top (26) 
+      // verify
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numAlloc() == 4);  // from extracting the 4 spys...
+      assertUnit(Spy::numAssign() == 4); // from extracting the 4 spys...
+      assertUnit(Spy::numDelete() == 4);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 4);
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    |    |    |    |    |
+      //    +----+----+----+----+
+      assertUnit(s.container.numElements == 0);
+      assertUnit(value1 == Spy(89));
+      assertUnit(value2 == Spy(67));
+      assertUnit(value3 == Spy(49));
+      assertUnit(value4 == Spy(26));
+      assertUnit(size1 == 4);
+      assertUnit(size2 == 3);
+      assertUnit(size3 == 2);
+      assertUnit(size4 == 1);
+      assertUnit(s.container.numCapacity == 4);
+
+      // teardown
+      teardownStandardFixture(s);
+   }
+
+   // remove all elements, ensure stack maintains size after each pop
+   void test_pop_stackSize()
+   {  // setup
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    | 26 | 49 | 67 | 89 |
+      //    +----+----+----+----+
+      custom::stack<Spy> s;
+      setupStandardFixture(s);
+      int size1; // size before pop
+      int size2; // size after one pop
+      int size3; // size after 2 pops
+      int size4; // size after 3 pops 
+      Spy::reset();
+      // exercise
+      size1 = s.container.numElements; // size is 4 elements 
+      s.pop();                         // remove top 
+      size2 = s.container.numElements; // size is 3 elements 
+      s.pop();                         // remove top 
+      size3 = s.container.numElements; // size is 2 elements 
+      s.pop();                         // remove top  
+      size4 = s.container.numElements; // size is 1 element 
+      s.pop();                         // remove top  
+      // verify
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numAlloc() == 0);  
+      assertUnit(Spy::numAssign() == 0); 
+      assertUnit(Spy::numDelete() == 4);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 4);
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    |    |    |    |    |
+      //    +----+----+----+----+
+      assertUnit(s.container.numElements == 0);
+      assertUnit(size1 == 4);
+      assertUnit(size2 == 3);
+      assertUnit(size3 == 2);
+      assertUnit(size4 == 1);
+      assertUnit(s.container.numCapacity == 4);
+
+      // teardown
+      teardownStandardFixture(s);
+   }
+
+   // remove all elements, ensure stack maintains correct order of elements after each pop
+   void test_pop_maintainsOrder()
+   {  // setup
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    | 26 | 49 | 67 | 89 |
+      //    +----+----+----+----+
+      custom::stack<Spy> s;
+      setupStandardFixture(s);
+      Spy value1; // should be 89
+      Spy value2; // should be 67
+      Spy value3; // should be 49 
+      Spy value4; // should be 26 
+      Spy::reset();
+      // exercise
+      value1 = s.container.data[3]; // top is 89
+      s.pop();                      // remove top (89) 
+      value2 = s.container.data[2]; // top is 67
+      s.pop();                      // remove top (67)
+      value3 = s.container.data[1]; // top is 49
+      s.pop();                      // remove top (49) 
+      value4 = s.container.data[0]; // top is 26
+      s.pop();                      // remove top (26) 
+      // verify
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numAlloc() == 4);  // from extracting the 4 spys...
+      assertUnit(Spy::numAssign() == 4); // from extracting the 4 spys...
+      assertUnit(Spy::numDelete() == 4);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 4);
+      //      0    1    2    3
+      //    +----+----+----+----+
+      //    |    |    |    |    |
+      //    +----+----+----+----+
+      assertUnit(s.container.numElements == 0);
+      assertUnit(value1 == Spy(89));
+      assertUnit(value2 == Spy(67));
+      assertUnit(value3 == Spy(49));
+      assertUnit(value4 == Spy(26));
+      assertUnit(s.container.numCapacity == 4);
+
+      // teardown
+      teardownStandardFixture(s);
+   }
+
+
    /*************************************************************
     * SETUP STANDARD FIXTURE
     *      0    1    2    3

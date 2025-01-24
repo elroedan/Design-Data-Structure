@@ -73,16 +73,10 @@ public:
    
    T & top()       
    { 
-      // Is the stack empty? 
-      /*if (!empty())
-         return container.back();*/
       return container.back();
    }
    const T & top() const 
    { 
-      // Is the stack empty? 
-      /*if (!empty())
-         return container.back();*/ 
       return container.back();
    }
 
