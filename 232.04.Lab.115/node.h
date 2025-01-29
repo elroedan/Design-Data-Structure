@@ -14,7 +14,9 @@
  *        Node         : A class representing a Node
  *    Additionally, it will contain a few functions working on Node
  * Author
- *    <your names here>
+ *    Jacob Mower 
+ *    Elroe 
+ *    Thatcher Albiston 
  ************************************************************************/
 
 #pragma once
@@ -40,19 +42,9 @@ public:
    // Construct
    //
 
-   Node() 
-   { 
-      pNext = pPrev = this;
-   }
-   Node(const T& data) 
-   {
-      pNext = pPrev = this;
-   }
-
-   Node(T&& data) 
-   {
-      pNext = pPrev = this;
-   }
+   Node()               : pNext(nullptr), pPrev(nullptr), data(T())  { }
+   Node(const T&  data) : pNext(nullptr), pPrev(nullptr), data(data) { }
+   Node(      T&& data) : pNext(nullptr), pPrev(nullptr), data(std::move(data)) { }
 
    //
    // Member variables
@@ -74,7 +66,16 @@ public:
 template <class T>
 inline Node <T> * copy(const Node <T> * pSource) 
 {
-   return new Node<T>;
+   if (!pSource)
+      return nullptr;
+   Node <T>* pDestination = new Node<T>(pSource->data);
+   Node <T>* pSrc = pSource->pNext;
+   Node <T>* pDes = pDestination;
+
+   for (Node<T>* p = pSrc; p; p = p->pNext)
+      pDes = insert(pDes, pSrc->data, true);
+
+   return pDestination;
 }
 
 /***********************************************
@@ -112,8 +113,21 @@ inline void swap(Node <T>* &pLHS, Node <T>* &pRHS)
 template <class T>
 inline Node <T> * remove(const Node <T> * pRemove) 
 {
-   
-   return new Node<T>;
+   if (!pRemove)
+      return nullptr;
+
+   if (pRemove->pPrev)
+      pRemove->pPrev->pNext = pRemove->pNext;
+   if (pRemove->pNext)
+      pRemove->pNext->pPrev = pRemove->pPrev;
+
+   Node<T>* pReturn;
+   if (pRemove->pPrev)
+      pReturn = pRemove->pPrev;
+   else
+      pReturn = pRemove->pNext;
+   delete pRemove;
+   return pReturn;
 }
 
 
@@ -133,7 +147,26 @@ inline Node <T> * insert(Node <T> * pCurrent,
                   const T & t,
                   bool after = false)
 {
-   return new Node<T>();
+   Node <T>* pNew = new Node <T>(t);
+   // Before pCurrent 
+   if (pCurrent != nullptr && !after)
+   {
+      pNew->pNext = pCurrent;
+      pNew->pPrev = pCurrent->pPrev;
+      pCurrent->pPrev = pNew;
+      if (pNew->pPrev)
+         pNew->pPrev->pNext = pNew;
+   }
+   // After pCurrent 
+   if (pCurrent != nullptr && after)
+   {
+      pNew->pPrev = pCurrent;
+      pNew->pNext = pCurrent->pNext;
+      pCurrent->pNext = pNew;
+      if (pNew->pNext)
+         pNew->pNext->pPrev = pNew;
+   }
+   return pNew;
 }
 
 /******************************************************
@@ -147,7 +180,13 @@ inline Node <T> * insert(Node <T> * pCurrent,
 template <class T>
 inline size_t size(const Node <T> * pHead)
 {
-   return 99;
+   size_t s = 0;
+   if (pHead)
+   {
+      for (const Node<T>* p = pHead; p; p = p->pNext)
+         s += 1;
+   }
+   return s;
 }
 
 /***********************************************
