@@ -89,7 +89,50 @@ inline Node <T> * copy(const Node <T> * pSource)
 template <class T>
 inline void assign(Node <T> * & pDestination, const Node <T> * pSource)
 {
+   const Node<T>* pSrc = pSource;
+   Node<T>* pDes = pDestination;
+   Node<T>* pDesPrevious = pDestination;
+
+   //Both loops have nodes
+   while (pSrc && pDes)
+   {
+      pDesPrevious = pDes;
+      pDes->data = pSrc->data;
+      pDes = pDes->pNext;
+      pSrc = pSrc->pNext;
+   }
    
+   //Destination has run out of nodes
+   if (pSrc)
+   {
+      pDes = pDesPrevious;
+      while (pSrc)
+      {
+         pDes = insert(pDes, pSrc->data, true); //Can you insert on a nullptr
+         if (!pDestination)
+         {
+            pDestination = pDes;
+         }
+         pSrc = pSrc->pNext;
+      }
+   }
+   //Source has run out of nodes, get rid of extra destination ones
+   else if (pDes)
+   {
+      bool setToNull = false;
+      
+      if (pDes->pPrev)
+         pDes->pPrev->pNext = nullptr;
+      else
+         setToNull = true;
+      
+      clear(pDes);
+      
+      //Source was empty so now destination needs to be.
+      if (setToNull)
+         pDestination = nullptr;
+      
+   }
 }
 
 /***********************************************
@@ -100,7 +143,7 @@ inline void assign(Node <T> * & pDestination, const Node <T> * pSource)
 template <class T>
 inline void swap(Node <T>* &pLHS, Node <T>* &pRHS)
 {
-   
+   std::swap(pLHS, pRHS);
 }
 
 /***********************************************
@@ -200,7 +243,8 @@ inline size_t size(const Node <T> * pHead)
 template <class T>
 inline std::ostream & operator << (std::ostream & out, const Node <T> * pHead)
 {
-   return out;
+   for (const Node<T>* p = pHead; p; p = p->pNext) //Ask brother helfrich about test cases for this
+      std::cout << p->data << std::endl;
 }
 
 /*****************************************************
@@ -213,7 +257,12 @@ inline std::ostream & operator << (std::ostream & out, const Node <T> * pHead)
 template <class T>
 inline void clear(Node <T> * & pHead)
 {
-   
+   while (pHead)
+   {
+      Node<T>* pDelete = pHead;
+      pHead = pHead->pNext;
+      delete pDelete;
+   }
 }
 
 
