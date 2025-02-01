@@ -73,7 +73,7 @@ inline Node <T> * copy(const Node <T> * pSource)
    Node <T>* pDes = pDestination;
 
    for (Node<T>* p = pSrc; p; p = p->pNext)
-      pDes = insert(pDes, pSrc->data, true);
+      pDes = insert(pDes, p->data, true);
 
    return pDestination;
 }
