@@ -15,7 +15,7 @@
  *    Additionally, it will contain a few functions working on Node
  * Author
  *    Jacob Mower 
- *    Elroe 
+ *    Elroe Woldemichael
  *    Thatcher Albiston 
  ************************************************************************/
 
@@ -66,15 +66,22 @@ public:
 template <class T>
 inline Node <T> * copy(const Node <T> * pSource) 
 {
+   // If the source node is null, return null
    if (!pSource)
       return nullptr;
-   Node <T>* pDestination = new Node<T>(pSource->data);
-   Node <T>* pSrc = pSource->pNext;
-   Node <T>* pDes = pDestination;
 
+   // Create a new node with the data from the source node
+   Node<T>* pDestination = new Node<T>(pSource->data);
+
+   // Initialize pointers for traversing the source and destination lists
+   Node<T>* pSrc = pSource->pNext;
+   Node<T>* pDes = pDestination;
+
+   // Traverse the source list and copy each node to the destination list
    for (Node<T>* p = pSrc; p; p = p->pNext)
       pDes = insert(pDes, p->data, true);
 
+   // Return the head of the copied list
    return pDestination;
 }
 
@@ -110,9 +117,8 @@ inline void assign(Node <T> * & pDestination, const Node <T> * pSource)
       {
          pDes = insert(pDes, pSrc->data, true);
          if (!pDestination)
-         {
             pDestination = pDes;
-         }
+         
          pSrc = pSrc->pNext;
       }
    }
@@ -156,20 +162,29 @@ inline void swap(Node <T>* &pLHS, Node <T>* &pRHS)
 template <class T>
 inline Node <T> * remove(const Node <T> * pRemove) 
 {
+   // If the node to be removed is null, return null
    if (!pRemove)
       return nullptr;
 
+   // Update the previous node's next pointer, if it exists
    if (pRemove->pPrev)
       pRemove->pPrev->pNext = pRemove->pNext;
+
+   // Update the next node's previous pointer, if it exists
    if (pRemove->pNext)
       pRemove->pNext->pPrev = pRemove->pPrev;
 
+   // Determine the node to return after removal
    Node<T>* pReturn;
    if (pRemove->pPrev)
       pReturn = pRemove->pPrev;
    else
       pReturn = pRemove->pNext;
+
+   // Delete the node to be removed
    delete pRemove;
+
+   // Return the node that follows the removed node
    return pReturn;
 }
 
