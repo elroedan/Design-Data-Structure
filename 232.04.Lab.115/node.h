@@ -73,7 +73,7 @@ inline Node <T> * copy(const Node <T> * pSource)
    Node <T>* pDes = pDestination;
 
    for (Node<T>* p = pSrc; p; p = p->pNext)
-      pDes = insert(pDes, pSrc->data, true);
+      pDes = insert(pDes, p->data, true);
 
    return pDestination;
 }
@@ -108,7 +108,7 @@ inline void assign(Node <T> * & pDestination, const Node <T> * pSource)
       pDes = pDesPrevious;
       while (pSrc)
       {
-         pDes = insert(pDes, pSrc->data, true); //Can you insert on a nullptr
+         pDes = insert(pDes, pSrc->data, true);
          if (!pDestination)
          {
             pDestination = pDes;
@@ -243,7 +243,7 @@ inline size_t size(const Node <T> * pHead)
 template <class T>
 inline std::ostream & operator << (std::ostream & out, const Node <T> * pHead)
 {
-   for (const Node<T>* p = pHead; p; p = p->pNext) //Ask brother helfrich about test cases for this
+   for (const Node<T>* p = pHead; p; p = p->pNext)
       std::cout << p->data << std::endl;
 }
 
