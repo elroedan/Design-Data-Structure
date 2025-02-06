@@ -45,7 +45,7 @@ public:
       test_destructor_standard();
 
       // Assign
-      /*test_assign_emptyToEmpty();
+      test_assign_emptyToEmpty();
       test_assign_standardToEmpty();
       test_assign_emptyToStandard();
       test_assign_smallToBig();
@@ -61,7 +61,7 @@ public:
       test_swap_emptyToEmpty();
       test_swap_standardToEmpty();
       test_swap_emptyToStandard();
-      test_swap_bigToSmall();*/
+      test_swap_bigToSmall();
 
       // Iterator
       test_iterator_begin_empty();
@@ -93,16 +93,16 @@ public:
       test_pushfront_standard();
       test_pushfront_moveEmpty();
       test_pushfront_moveStandard();
-      /*test_insert_empty();
+      test_insert_empty();
       test_insert_standardFront();
       test_insert_standardMiddle();
       test_insert_standardEnd();
       test_insertMove_empty();
       test_insertMove_standardFront();
-      test_insertMove_standardMiddle();*/
+      test_insertMove_standardMiddle();
 
       // Remove
-      /*test_clear_empty();
+      test_clear_empty();
       test_clear_standard();
       test_popback_empty();
       test_popback_standard();
@@ -113,7 +113,7 @@ public:
       test_erase_empty();
       test_erase_standardFront();
       test_erase_standardMiddle();
-      test_erase_standardEnd();*/
+      test_erase_standardEnd();
 
       // Status
       test_size_empty();
