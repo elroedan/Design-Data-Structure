@@ -144,7 +144,7 @@ void clear(BNode <T> * & pThis)
    if (!pThis)
       return ;
    
-   
+   //Recurse down
    clear(pThis->pLeft);
    clear(pThis->pRight);
    delete pThis;
@@ -172,14 +172,17 @@ inline void swap(BNode <T>*& pLHS, BNode <T>*& pRHS)
 template <class T>
 BNode <T> * copy(const BNode <T> * pSrc) 
 {
+   //Source is empty
    if (!pSrc)
       return nullptr;
    BNode <T>* pDest = new BNode <T> (pSrc->data);
 
+   //Left branch
    pDest->pLeft = copy(pSrc->pLeft);
    if (pDest->pLeft)
       pDest->pLeft->pParent = pDest;
 
+   //Right Branch
    pDest->pRight = copy(pSrc->pRight);
    if (pDest->pRight)
       pDest->pRight->pParent = pDest;
@@ -195,21 +198,26 @@ BNode <T> * copy(const BNode <T> * pSrc)
 template <class T>
 void assign(BNode <T> * & pDest, const BNode <T>* pSrc)
 {
+   //Source is empty, clear dest
    if (!pSrc)
    {
       clear(pDest);
       return;
    }
 
+   //Destination is empty
    if (!pDest && pSrc)
       pDest = new BNode <T>(pSrc->data);
    
+   //Neither is empty
    else if (pSrc && pDest)
       pDest->data = pSrc->data;
   
+   //Recurse down
    assign(pDest->pRight, pSrc->pRight);
    assign(pDest->pLeft, pSrc->pLeft);
 
+   //Connect parents and children
    if(pDest->pLeft)
       pDest->pLeft->pParent = pDest;
    if (pDest->pRight)
