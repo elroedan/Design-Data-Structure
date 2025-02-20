@@ -48,7 +48,7 @@ public:
 
 
       // Assign
-      /*test_assign_emptyToEmpty();
+      test_assign_emptyToEmpty();
       test_assign_standardToEmpty();
       test_assign_emptyToStandard();
       test_assign_oneToStandard();
@@ -65,7 +65,7 @@ public:
       test_swap_emptyToEmpty();
       test_swap_standardToEmpty();
       test_swap_emptyToStandard();
-      test_swap_standardToStandard();*/
+      test_swap_standardToStandard();
 
       // Iterator
       /*test_begin_empty();
@@ -118,15 +118,15 @@ public:
       test_erase_noChildren();
       test_erase_oneChild();
       test_erase_twoChildren();
-      test_erase_twoChildrenSpecial();
+      test_erase_twoChildrenSpecial();*/
       test_clear_empty();
-      test_clear_standard();*/
+      test_clear_standard();
 
       // Status
-      /*test_empty_empty();
+      test_empty_empty();
       test_empty_standard();
       test_size_empty();
-      test_size_standard();*/
+      test_size_standard();
 
       report("BST");
    }
