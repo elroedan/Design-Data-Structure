@@ -68,7 +68,7 @@ public:
       test_swap_standardToStandard();
 
       // Iterator
-      /*test_begin_empty();
+      test_begin_empty();
       test_begin_standard();
       test_end_standard();
       test_iterator_increment_standardToParent();
@@ -83,20 +83,20 @@ public:
       test_iterator_decrement_standardToGrandchild();
       test_iterator_decrement_standardToDone();
       test_iterator_decrement_standardEnd();
-      test_iterator_dereference_standardRead();*/
+      test_iterator_dereference_standardRead();
 
       // Find
-      /*test_find_empty();
+      test_find_empty();
       test_find_standardBegin();
       test_find_standardLast();
-      test_find_standardMissing();*/
+      test_find_standardMissing();
 
       // Insert
-      /*test_insert_oneLeft();
+      test_insert_oneLeft();
       test_insert_oneRight();
       test_insert_duplicate();
       test_insert_keepUnique();
-      test_insertMove_oneLeft();
+      /*test_insertMove_oneLeft();
       test_insertMove_oneRight();
       test_insertMove_duplicate();
       test_insertMove_keepUnique();
