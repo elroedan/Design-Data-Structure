@@ -288,7 +288,7 @@ BST <T> ::BST()
 template <typename T>
 BST <T> :: BST ( const BST<T>& rhs) : root(nullptr), numElements(0)
 {
-   (*this) = rhs;
+   *this = rhs;
 }
 
 /*********************************************
@@ -383,9 +383,10 @@ std::pair<typename BST <T> :: iterator, bool> BST <T> :: insert(const T & t, boo
    if (keepUnique)
    {
       // We found the element in the tree...
-      if (find(t) != end())
+      auto it = find(t);
+      if (it != end())
       {
-         std::pair<iterator, bool> pairReturn(end(), false);
+         std::pair<iterator, bool> pairReturn(it, false);
          return pairReturn;
       }
    }
@@ -402,28 +403,106 @@ std::pair<typename BST <T> :: iterator, bool> BST <T> :: insert(const T & t, boo
       while (pCurrent)
       {
          pParent = pCurrent; 
-         if (pNew->data < pCurrent->data)
+         if (t < pCurrent->data)
+         {
             pCurrent = pCurrent->pLeft;
+            if (pCurrent == nullptr)
+               pParent->addLeft(pNew);
+         }
          else
+         {
             pCurrent = pCurrent->pRight; 
+            if (pCurrent == nullptr)
+               pParent->addRight(pNew);
+         }
       }
 
-      if (pNew->data < pParent->data)
+      /*if (t < pParent->data)
          pParent->addLeft(pNew);
       else
-         pParent->addRight(pNew);
+         pParent->addRight(pNew);*/
 
-      pNew->pParent = pParent; 
+      //pNew->pParent = pParent; // addLeft and addRight set parent for us...
    }
    pNew->balance(); 
+   // Update root if need be... I DONT LIKE THIS BUT IT WORKS
+   if (root->pParent)
+   {
+      BNode* pNode = root; 
+      BNode* pNewRoot = nullptr; 
+      while (pNode)
+      {
+         pNewRoot = pNode;
+         pNode = pNode->pParent; 
+      }
+      root = pNewRoot;
+   }
+   numElements++; 
    return std::pair<iterator, bool>(iterator(pNew), true);
 }
 
 template <typename T>
 std::pair<typename BST <T> ::iterator, bool> BST <T> :: insert(T && t, bool keepUnique)
 {
-   std::pair<iterator, bool> pairReturn(end(), false);
-   return pairReturn;
+   if (keepUnique)
+   {
+      // We found the element in the tree...
+      auto it = find(t);
+      if (it != end())
+      {
+         std::pair<iterator, bool> pairReturn(it, false);
+         return pairReturn;
+      }
+   }
+
+   // Create a new node
+   BNode* pNew = new BNode(std::move(t));
+
+   if (root == nullptr)
+      root = pNew;
+   else
+   {
+      BNode* pParent = nullptr;
+      BNode* pCurrent = root;
+      while (pCurrent)
+      {
+         pParent = pCurrent;
+         if (pNew->data < pCurrent->data)
+         {
+            pCurrent = pCurrent->pLeft;
+            if (pCurrent == nullptr)
+               pParent->addLeft(pNew);
+         }
+         else
+         {
+            pCurrent = pCurrent->pRight;
+            if (pCurrent == nullptr)
+               pParent->addRight(pNew);
+         }
+      }
+
+      /*if (pNew->data < pParent->data)
+         pParent->addLeft(pNew);
+      else
+         pParent->addRight(pNew);*/
+
+      //pNew->pParent = pParent;
+   }
+   pNew->balance();
+   // Update root if need be... I DONT LIKE THIS BUT IT WORKS
+   if (root->pParent)
+   {
+      BNode* pNode = root;
+      BNode* pNewRoot = nullptr;
+      while (pNode)
+      {
+         pNewRoot = pNode;
+         pNode = pNode->pParent;
+      }
+      root = pNewRoot;
+   }
+   numElements++; 
+   return std::pair<iterator, bool>(iterator(pNew), true);
 }
 
 /*************************************************
@@ -433,6 +512,49 @@ std::pair<typename BST <T> ::iterator, bool> BST <T> :: insert(T && t, bool keep
 template <typename T>
 typename BST <T> ::iterator BST <T> :: erase(iterator & it)
 {  
+   if (it.pNode)
+   {
+      if (it.pNode->pRight == nullptr && it.pNode->pLeft == nullptr)
+      {
+         if (it.pNode->pParent != nullptr && it.pNode->isRightChild(it.pNode->pParent))
+            it.pNode->pParent->pRight = nullptr;
+         if (it.pNode->pParent != nullptr && it.pNode->isLeftChild(it.pNode->pParent))
+            it.pNode->pParent->pLeft = nullptr;
+         //iterator itNext((++it));
+         iterator itNext(it); 
+         delete it.pNode;
+         
+         ++itNext;
+         return itNext;
+      }
+
+      if (it.pNode->pRight == nullptr && it.pNode->pLeft != nullptr)
+      {
+         it.pNode->pLeft->pParent = it.pNode->pParent;
+         if (it.pNode->pParent != nullptr && it.pNode->isRightChild(it.pNode->pParent))
+            it.pNode->pParent->pRight = it.pNode->pLeft;
+         if (it.pNode->pParent != nullptr && it.pNode->isLeftChild(it.pNode->pParent))
+            it.pNode->pParent->pLeft = it.pNode->pLeft;
+
+         /*iterator itNext((++it));
+         delete it.pNode;
+
+         return itNext;*/
+      }
+      if (it.pNode->pLeft == nullptr && it.pNode->pRight != nullptr)
+      {
+         it.pNode->pRight->pParent = it.pNode->pParent;
+         if (it.pNode->pParent != nullptr && it.pNode->isRightChild(it.pNode->pParent))
+            it.pNode->pParent->pRight = it.pNode->pRight;
+         if (it.pNode->pParent != nullptr && it.pNode->isLeftChild(it.pNode->pParent))
+            it.pNode->pParent->pLeft = it.pNode->pRight;
+         /*iterator itNext((++it));
+         delete it.pNode;
+
+         return itNext;*/
+      }
+   }
+
    return end();
 }
 
@@ -444,6 +566,7 @@ template <typename T>
 void BST <T> ::clear() noexcept
 {
    deleteBinaryTree(root);
+   numElements = 0; 
 }
 
 template <typename T> 
@@ -596,11 +719,17 @@ void BST <T> :: assign(BNode *& pDest, const BNode * pSrc)
 
    // Destination is empty
    if (!pDest && pSrc)
+   {
       pDest = new BNode(pSrc->data);
+      pDest->isRed = pSrc->isRed; // dont forget to copy the color!
+   }
 
    // Neither is empty
    else if (pSrc && pDest)
+   {
       pDest->data = pSrc->data;
+      pDest->isRed = pSrc->isRed; // dont forget to copy the color!
+   }
 
    // Recurse down
    assign(pDest->pRight, pSrc->pRight);
@@ -742,217 +871,121 @@ int BST <T> :: BNode :: computeSize() const
 template <typename T>
 void BST <T> :: BNode :: balance()
 {
-   //// Case 1: if we are the root, then color ourselves black and call it a day.
-   //if (pParent == nullptr)
-   //{
-   //   isRed = false; 
-   //   return; 
-   //}
-
-   //// Case 2: if the parent is black, then there is nothing left to do
-   //if (!pParent->isRed)
-   //   return; 
-   //// Case 3: if the aunt is red, then just recolor
-   //else
-   //{
-   //   if (pParent->isLeftChild(pParent->pParent))
-   //   {
-   //      if (pParent->pParent->pRight && pParent->pParent->pRight->isRed)
-   //      {
-   //         pParent->pParent->isRed = true; 
-   //         pParent->pParent->pRight->isRed = false; 
-   //         pParent->isRed = false;
-   //      }
-   //   }
-   //   else
-   //   {
-   //      if (pParent->pParent->pLeft && pParent->pParent->pLeft->isRed)
-   //      {
-   //         pParent->pParent->isRed = true;
-   //         pParent->pParent->pLeft->isRed = false;
-   //         pParent->isRed = false;
-   //      }
-   //   }
-   //}
-   //
-   //// Case 4: if the aunt is black or non-existant, then we need to rotate
-   //if (pParent->isRed && !pParent->pParent->isRed)
-   //{
-   //   if (pParent->isLeftChild(pParent->pParent))
-   //   {
-   //      // Case 4a: We are mom's left and mom is granny's left
-   //      if (isLeftChild(pParent))
-   //      {
-   //         pParent->addRight(pParent->pParent);
-   //         pParent->pParent->addLeft(pParent->pRight);
-
-   //         // pHead <- pParent 
-   //         if (pParent->pParent->pParent == nullptr)
-   //         {
-   //            pParent->pParent = nullptr; 
-   //            //root = pParent; 
-   //         }
-   //         else
-   //         {
-   //            // is our grandparent a left child? 
-   //            if (pParent->pParent->isLeftChild(pParent->pParent->pParent))
-   //               // set our parent to be our great grandparent's new left child
-   //               pParent->pParent->pParent->addLeft(pParent);
-   //            // its a right child 
-   //            else
-   //               // set our parent to be our great grandparent's new right child
-   //               pParent->pParent->pParent->addRight(pParent);
-   //         }
-   //         pParent->pParent->isRed = true; 
-   //         pParent->isRed = false; 
-   //      }
-   //      // Case 4c: We are mom's right and mom is granny's left
-   //      else
-   //      {
-   //         pParent->pParent->addLeft(pRight);
-   //         pParent->addRight(pLeft);
-
-   //         if (!pParent->pParent)
-   //            pParent = nullptr;
-   //         else if (pParent->pParent->isRightChild(pParent->pParent->pParent))
-   //            pParent->pParent->pParent->addRight(this);
-   //         else
-   //            pParent->pParent->pParent->addLeft(this);
-
-   //         this->addRight(pParent->pParent);
-   //         this->addLeft(pParent);
-
-   //         pParent->pParent->isRed = true;
-   //         this->isRed = false;
-   //      }
-   //   }
-   //   else
-   //   {
-   //      // case 4d: we are mom's left and mom is granny's right
-   //      if (isLeftChild(pParent))
-   //      {
-   //         pParent->pParent->addRight(pLeft);
-   //         pParent->addLeft(pRight);
-
-   //         if (!pParent->pParent)
-   //            pParent = nullptr;
-   //         else if (pParent->pParent->isRightChild(pParent->pParent->pParent))
-   //            pParent->pParent->pParent->addRight(this);
-   //         else 
-   //            pParent->pParent->pParent->addLeft(this);
-
-   //         this->addLeft(pParent->pParent);
-   //         this->addRight(pParent);
-
-   //         pParent->pParent->isRed = true;
-   //         this->isRed = false; 
-   //      }
-   //      // case 4b: We are mom's right and mom is granny's right
-   //      else
-   //      {
-   //         pParent->addLeft(pParent->pParent);
-   //         pParent->pParent->addRight(pParent->pLeft);
-   //         // pHead <- pParent 
-   //         if (pParent->pParent->pParent == nullptr)
-   //         {
-   //            pParent->pParent = nullptr;
-   //            //root = pParent;
-   //         }
-   //         else
-   //         {
-   //            // is our grandparent a left child? 
-   //            if (pParent->pParent->isLeftChild(pParent->pParent->pParent))
-   //               // set our parent to be our great grandparent's new left child
-   //               pParent->pParent->pParent->addLeft(pParent);
-   //            // its a right child 
-   //            else
-   //               // set our parent to be our great grandparent's new right child
-   //               pParent->pParent->pParent->addRight(pParent);
-   //         }
-   //         pParent->pParent->isRed = true;
-   //         pParent->isRed = false;
-   //      }
-   //   }
-   //}
-
-// Case 1: if we are the root, then color ourselves black and call it a day.
-if (pParent == nullptr)
-{
-   isRed = false;
-   return;
-}
-
-// Case 2: if the parent is black, then there is nothing left to do
-//assert(isRed);              // we should still be red...
-//assert(pParent != nullptr); // we are not root...
-
-if (!pParent->isRed)
-return;
-
-// Case 3: if the aunt is red, then just recolor 
-//assert(pParent->isRed); // our parent must be red...
-
-// we can't have an aunt if our parent is root...
-if (pParent->pParent == nullptr)
-{
-   pParent->balance(); // color our parent black 
-   return;
-}
-
-//assert(pParent->pParent); // we have a grandparent 
-
-BNode* pGrandparent = pParent->pParent;
-BNode* pAunt = nullptr;
-bool parentIsLeft = pParent->isLeftChild(pGrandparent);
-if (parentIsLeft)
-pAunt = pGrandparent->pRight;
-else
-pAunt = pGrandparent->pLeft;
-
-// Our Aunt exists and is red...
-if (pAunt && pAunt->isRed)
-{
-   pGrandparent->isRed = true;  // color the grandparent red
-   pParent->isRed = false; // color the parent black 
-   pAunt->isRed = false; // color the aunt black    
-   pGrandparent->balance();     // balance up the tree if necessary... 
-   return;
-}
-
-// Case 4: if the aunt is black or non-existant, then we need to rotate
-
-// If we've made it here then we know that either the aunt is black or non-existant and that our parent is red...
-//assert(pAunt == nullptr || !pAunt->isRed); // aunt must be black or non-existant 
-
-if (parentIsLeft) // mom is granny's left 
-{
-   if (isLeftChild(pParent)) // Case 4a: We are mom's left and mom is granny's left 
+   // Case 1: if we are the root, then color ourselves black and call it a day.
+   if (pParent == nullptr)
    {
-      rotateRight(pGrandparent, pAunt);
+      isRed = false;
+      return;
    }
-   else // Case 4c: We are mom's right and mom is granny's left 
-   {
-      // rotate left around the parent... 
-      rotateLeft(pGrandparent, pAunt);
-      // rotate right around the grandparent...
-      rotateRight(pGrandparent, pAunt);
-   }
-}
-else // mom is granny's right 
-{
-   if (isRightChild(pParent)) // Case 4b: We are mom's right and mom is granny's right 
-   {
-      rotateLeft(pGrandparent, pAunt);
-   }
-   else // Case 4d: We are mom's left and mom is granny's right 
-   {
-      // rotate right around the parent...
-      rotateRight(pGrandparent, pAunt);
-      // rotate left around the grandparent...
-      rotateLeft(pGrandparent, pAunt);
-   }
-}
 
+   // Case 2: if the parent is black, then there is nothing left to do
+   //assert(isRed);              // we should still be red...
+   //assert(pParent != nullptr); // we are not root...
+
+   if (!pParent->isRed)
+      return;
+
+   // Case 3: if the aunt is red, then just recolor 
+   //assert(pParent->isRed); // our parent must be red...
+
+   // we can't have an aunt if our parent is root...
+   if (pParent->pParent == nullptr)
+   {
+      pParent->balance(); // color our parent black 
+      return;
+   }
+
+   //assert(pParent->pParent); // we have a grandparent 
+
+   BNode* pGrandparent = pParent->pParent;
+   BNode* pAunt = nullptr;
+   bool parentIsLeft = pParent->isLeftChild(pGrandparent);
+   if (parentIsLeft)
+      pAunt = pGrandparent->pRight;
+   else
+      pAunt = pGrandparent->pLeft;
+
+   // Our Aunt exists and is red...
+   if (pAunt && pAunt->isRed)
+   {
+      pGrandparent->isRed = true;  // color the grandparent red
+      pParent->isRed = false; // color the parent black 
+      pAunt->isRed = false; // color the aunt black    
+      pGrandparent->balance();     // balance up the tree if necessary... 
+      return;
+   }
+
+   // Case 4: if the aunt is black or non-existant, then we need to rotate
+
+   // If we've made it here then we know that either the aunt is black or non-existant and that our parent is red...
+   //assert(pAunt == nullptr || !pAunt->isRed); // aunt must be black or non-existant 
+
+   if (parentIsLeft) // mom is granny's left 
+   {
+      if (isLeftChild(pParent)) // Case 4a: We are mom's left and mom is granny's left 
+      {
+         rotateRight(pGrandparent, pAunt);
+      }
+      else // Case 4c: We are mom's right and mom is granny's left 
+      {
+         // rotate left around the parent... 
+         //rotateLeft(pGrandparent, pAunt);
+         //rotateRight(pGrandparent, pAunt);
+         /*if (pRight)
+            pRight->rotateLeft(pParent, pParent->pLeft);*/
+         
+         // rotate right around the grandparent...
+         //rotateRight(pParent, pParent->pRight);
+
+         pGrandparent->addLeft(pRight);
+         pParent->addRight(pLeft);
+         BNode* pOldParent = pParent; // in case we're root, don't lose our parent...
+
+         if (pGrandparent->pParent == nullptr)
+            pParent = nullptr;
+         else if (pGrandparent->isRightChild(pGrandparent->pParent))
+            pGrandparent->pParent->addRight(this);
+         else
+            pGrandparent->pParent->addLeft(this);
+
+         addRight(pGrandparent);
+         addLeft(pOldParent);
+
+         pGrandparent->isRed = true;
+         isRed = false;
+      }
+   }
+   else // mom is granny's right 
+   {
+      if (isRightChild(pParent)) // Case 4b: We are mom's right and mom is granny's right 
+      {
+         rotateLeft(pGrandparent, pAunt);
+      }
+      else // Case 4d: We are mom's left and mom is granny's right 
+      {
+         // rotate right around the parent...
+         //rotateRight(pGrandparent, pAunt);
+         // rotate left around the grandparent...
+         //rotateLeft(pGrandparent, pAunt);
+
+         pGrandparent->addRight(pLeft);
+         pParent->addLeft(pRight);
+         BNode* pOldParent = pParent; // in case we're root, don't lose our parent...
+
+         if (pGrandparent->pParent == nullptr)
+            pParent = nullptr;
+         else if (pGrandparent->isRightChild(pGrandparent->pParent))
+            pGrandparent->pParent->addRight(this);
+         else
+            pGrandparent->pParent->addLeft(this);
+
+         addLeft(pGrandparent);
+         addRight(pOldParent);
+
+         pGrandparent->isRed = true; 
+         isRed = false; 
+      }
+   }
 }
 
 // can we modify the right rotate and left rotate to cover all four scenarios with case 4??? 
@@ -993,8 +1026,8 @@ void BST <T> ::BNode::rotateRight(BNode* pGrandparent, BNode* pAunt) // right co
          pHead->addRight(pParent);
    }
    else // parent is now the root 
-      //pParent->pParent = nullptr;
-      pGrandparent->pParent = pParent;
+      pParent->pParent = nullptr;
+      //pGrandparent->pParent = pParent;
 
    // Grandparent is colored red 
    //pParent->pRight->isRed = true; 
