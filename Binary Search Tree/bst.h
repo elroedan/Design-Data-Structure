@@ -17,6 +17,8 @@
  *    Jacob Mower 
  *    Elroe Woldemichael
  *    Thacther Albintson
+ *
+ * BALANCE FUNCTION IS RECURSIVE
  ************************************************************************/
 
 #pragma once
