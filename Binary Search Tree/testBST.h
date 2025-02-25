@@ -68,7 +68,7 @@ public:
       test_swap_standardToStandard();
 
       // Iterator
-      /*test_begin_empty();
+      test_begin_empty();
       test_begin_standard();
       test_end_standard();
       test_iterator_increment_standardToParent();
@@ -83,16 +83,16 @@ public:
       test_iterator_decrement_standardToGrandchild();
       test_iterator_decrement_standardToDone();
       test_iterator_decrement_standardEnd();
-      test_iterator_dereference_standardRead();*/
+      test_iterator_dereference_standardRead();
 
       // Find
-      /*test_find_empty();
+      test_find_empty();
       test_find_standardBegin();
       test_find_standardLast();
-      test_find_standardMissing();*/
+      test_find_standardMissing();
 
       // Insert
-      /*test_insert_oneLeft();
+      test_insert_oneLeft();
       test_insert_oneRight();
       test_insert_duplicate();
       test_insert_keepUnique();
@@ -110,14 +110,14 @@ public:
       test_insert_case4aComplex();
       test_insert_case4bComplex();
       test_insert_case4cComplex();
-      test_insert_case4dComplex();*/
+      test_insert_case4dComplex();
 
       // Remove
-      /*test_erase_empty();
+      test_erase_empty();
       test_erase_standardMissing();
       test_erase_noChildren();
       test_erase_oneChild();
-      test_erase_twoChildren();
+      /*test_erase_twoChildren();
       test_erase_twoChildrenSpecial();*/
       test_clear_empty();
       test_clear_standard();
