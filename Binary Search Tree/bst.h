@@ -513,53 +513,69 @@ std::pair<typename BST <T> ::iterator, bool> BST <T> :: insert(T && t, bool keep
  * Remove a given node as specified by the iterator
  ************************************************/
 template <typename T>
-typename BST <T> ::iterator BST <T> :: erase(iterator & it)
-{  
-   if (it.pNode)
+typename BST<T>::iterator BST<T>::erase(iterator& it)
+{
+   if (!it.pNode) return end(); // If iterator is invalid, return end()
+
+   BNode* pToDelete = it.pNode; // Store the node to be deleted
+   iterator itNext = it;
+   ++itNext; // Move to the next iterator before deleting the node
+
+   // Case 1: Node has no children (leaf node)
+   if (!pToDelete->pLeft && !pToDelete->pRight)
    {
-      if (it.pNode->pRight == nullptr && it.pNode->pLeft == nullptr)
+      if (pToDelete->pParent)
       {
-         if (it.pNode->pParent != nullptr && it.pNode->isRightChild(it.pNode->pParent))
-            it.pNode->pParent->pRight = nullptr;
-         if (it.pNode->pParent != nullptr && it.pNode->isLeftChild(it.pNode->pParent))
-            it.pNode->pParent->pLeft = nullptr;
-         //iterator itNext((++it));
-         iterator itNext(it); 
-         delete it.pNode;
-         
-         ++itNext;
-         return itNext;
+         if (pToDelete->isRightChild(pToDelete->pParent))
+            pToDelete->pParent->pRight = nullptr;
+         else
+            pToDelete->pParent->pLeft = nullptr;
       }
-
-      if (it.pNode->pRight == nullptr && it.pNode->pLeft != nullptr)
+      else
       {
-         it.pNode->pLeft->pParent = it.pNode->pParent;
-         if (it.pNode->pParent != nullptr && it.pNode->isRightChild(it.pNode->pParent))
-            it.pNode->pParent->pRight = it.pNode->pLeft;
-         if (it.pNode->pParent != nullptr && it.pNode->isLeftChild(it.pNode->pParent))
-            it.pNode->pParent->pLeft = it.pNode->pLeft;
-
-         /*iterator itNext((++it));
-         delete it.pNode;
-
-         return itNext;*/
-      }
-      if (it.pNode->pLeft == nullptr && it.pNode->pRight != nullptr)
-      {
-         it.pNode->pRight->pParent = it.pNode->pParent;
-         if (it.pNode->pParent != nullptr && it.pNode->isRightChild(it.pNode->pParent))
-            it.pNode->pParent->pRight = it.pNode->pRight;
-         if (it.pNode->pParent != nullptr && it.pNode->isLeftChild(it.pNode->pParent))
-            it.pNode->pParent->pLeft = it.pNode->pRight;
-         /*iterator itNext((++it));
-         delete it.pNode;
-
-         return itNext;*/
+         // The node is the root of the BST
+         root = nullptr;
       }
    }
+   // Case 2: Node has only one child
+   else if (!pToDelete->pLeft || !pToDelete->pRight)
+   {
+      BNode* child = (pToDelete->pLeft) ? pToDelete->pLeft : pToDelete->pRight;
+      child->pParent = pToDelete->pParent;
 
-   return end();
+      if (pToDelete->pParent)
+      {
+         if (pToDelete->isRightChild(pToDelete->pParent))
+            pToDelete->pParent->pRight = child;
+         else
+            pToDelete->pParent->pLeft = child;
+      }
+      else
+      {
+         // The node is the root of the BST
+         root = child;
+      }
+   }
+   // Case 3: Node has two children
+   else
+   {
+      // Find the in-order successor (smallest in right subtree)
+      iterator successor = it;
+      ++successor; // Move to next in-order node
+      BNode* pSuccessor = successor.pNode;
+
+      // Swap values
+      std::swap(pToDelete->data, pSuccessor->data);
+
+      // Recursively delete the successor node
+      return erase(successor);
+   }
+
+   delete pToDelete; // Free memory
+   numElements--; // Decrement element count
+   return itNext; // Return next valid iterator
 }
+
 
 /*****************************************************
  * BST :: CLEAR
