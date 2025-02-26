@@ -117,8 +117,8 @@ public:
       test_erase_standardMissing();
       test_erase_noChildren();
       test_erase_oneChild();
-      /*test_erase_twoChildren();
-      test_erase_twoChildrenSpecial();*/
+      test_erase_twoChildren();
+      test_erase_twoChildrenSpecial();
       test_clear_empty();
       test_clear_standard();
 
@@ -3799,7 +3799,7 @@ public:
       assertUnit(p50->pLeft == p30);
       assertUnit(p50->pRight == p60);
       assertUnit(p30->pLeft == p20);
-      assertUnit(p30->pRight = p40);
+      assertUnit(p30->pRight == p40);
       assertUnit(p30->pParent == p50);
       assertUnit(p20->pParent == p30);
       assertUnit(p40->pParent == p30);
@@ -3865,9 +3865,9 @@ public:
       assertUnit(p70->pLeft == p30);
       assertUnit(p70->pRight == p80);
       assertUnit(p30->pLeft == p10);
-      assertUnit(p30->pRight = p50);
+      assertUnit(p30->pRight == p50);
       assertUnit(p50->pLeft == p40);
-      assertUnit(p50->pRight = p60);
+      assertUnit(p50->pRight == p60);
       assertUnit(p30->pParent == p70);
       assertUnit(p80->pParent == p70);
       assertUnit(p10->pParent == p30);

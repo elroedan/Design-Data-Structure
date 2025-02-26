@@ -517,19 +517,19 @@ typename BST<T>::iterator BST<T>::erase(iterator& it)
 {
    if (!it.pNode) return end(); // If iterator is invalid, return end()
 
-   BNode* pToDelete = it.pNode; // Store the node to be deleted
+//   BNode* pToDelete = it.pNode; // Store the node to be deleted
    iterator itNext = it;
    ++itNext; // Move to the next iterator before deleting the node
 
    // Case 1: Node has no children (leaf node)
-   if (!pToDelete->pLeft && !pToDelete->pRight)
+   if (!it.pNode->pLeft && !it.pNode->pRight)
    {
-      if (pToDelete->pParent)
+      if (it.pNode->pParent)
       {
-         if (pToDelete->isRightChild(pToDelete->pParent))
-            pToDelete->pParent->pRight = nullptr;
+         if (it.pNode->isRightChild(it.pNode->pParent))
+            it.pNode->pParent->pRight = nullptr;
          else
-            pToDelete->pParent->pLeft = nullptr;
+            it.pNode->pParent->pLeft = nullptr;
       }
       else
       {
@@ -538,17 +538,17 @@ typename BST<T>::iterator BST<T>::erase(iterator& it)
       }
    }
    // Case 2: Node has only one child
-   else if (!pToDelete->pLeft || !pToDelete->pRight)
+   else if (!it.pNode->pLeft || !it.pNode->pRight)
    {
-      BNode* child = (pToDelete->pLeft) ? pToDelete->pLeft : pToDelete->pRight;
-      child->pParent = pToDelete->pParent;
+      BNode* child = (it.pNode->pLeft) ? it.pNode->pLeft : it.pNode->pRight;
+      child->pParent = it.pNode->pParent;
 
-      if (pToDelete->pParent)
+      if (it.pNode->pParent)
       {
-         if (pToDelete->isRightChild(pToDelete->pParent))
-            pToDelete->pParent->pRight = child;
+         if (it.pNode->isRightChild(it.pNode->pParent))
+            it.pNode->pParent->pRight = child;
          else
-            pToDelete->pParent->pLeft = child;
+            it.pNode->pParent->pLeft = child;
       }
       else
       {
@@ -559,19 +559,63 @@ typename BST<T>::iterator BST<T>::erase(iterator& it)
    // Case 3: Node has two children
    else
    {
-      // Find the in-order successor (smallest in right subtree)
-      iterator successor = it;
-      ++successor; // Move to next in-order node
-      BNode* pSuccessor = successor.pNode;
 
-      // Swap values
-      std::swap(pToDelete->data, pSuccessor->data);
+      // Swap Pointers
+      // Update parent's child
+      if (it.pNode->isLeftChild(it.pNode->pParent))
+         it.pNode->pParent->pLeft = itNext.pNode;
+      else
+         it.pNode->pParent->pRight = itNext.pNode;
+
+      //Update children's parent but only if
+      // they are not parent child
+      if (itNext.pNode->isLeftChild(it.pNode))
+      {
+         //Swap childs parent
+         it.pNode->pRight->pParent = itNext.pNode;
+         //Swap right nodes
+         std::swap(it.pNode->pRight, itNext.pNode->pRight);
+         //Swap remaining pointers
+         it.pNode->pLeft = itNext.pNode->pRight;
+         itNext.pNode->pLeft = it.pNode;
+         itNext.pNode->pParent = it.pNode->pParent;
+         it.pNode->pParent = itNext.pNode;
+      }
+      else if (itNext.pNode->isRightChild(it.pNode))
+      {
+         //Swap childs parent
+         it.pNode->pLeft->pParent = itNext.pNode;
+         //Swap left nodes
+         std::swap(it.pNode->pLeft, itNext.pNode->pLeft);
+         //Swap remaining pointers
+         it.pNode->pRight = itNext.pNode->pRight;
+         itNext.pNode->pRight = it.pNode;
+         itNext.pNode->pParent = it.pNode->pParent;
+         it.pNode->pParent = itNext.pNode;
+
+      }
+      else
+      {
+         //Swap Parents
+         std::swap(it.pNode->pParent, itNext.pNode->pParent);
+         //Swap lefts
+         std::swap(it.pNode->pLeft, itNext.pNode->pLeft);
+         //Swap rights
+         std::swap(it.pNode->pRight, itNext.pNode->pRight);
+         //Swap childrens parents(us)
+         itNext.pNode->pRight->pParent = itNext.pNode;
+         itNext.pNode->pLeft->pParent = itNext.pNode;
+
+      }
+
+
 
       // Recursively delete the successor node
-      return erase(successor);
+      erase(it);
+      return itNext; // Return next valid iterator
    }
 
-   delete pToDelete; // Free memory
+   delete it.pNode; // Free memory
    numElements--; // Decrement element count
    return itNext; // Return next valid iterator
 }
