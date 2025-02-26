@@ -18,7 +18,8 @@
  *    Elroe Woldemichael
  *    Thacther Albintson
  *
- * BALANCE FUNCTION IS RECURSIVE
+ * BALANCE FUNCTION IS RECURSIVE ONLY RECURSE ON CASE 3!!!!!!!!!!!!!!!!!!!!!!!!
+ *   CASE 3 ALWAYS RECURSES OFF OF GRANDPARENT
  ************************************************************************/
 
 #pragma once
