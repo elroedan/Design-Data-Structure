@@ -383,129 +383,132 @@ namespace custom
    template <typename T>
    std::pair<typename BST <T> ::iterator, bool> BST <T> ::insert(const T& t, bool keepUnique)
    {
-      if (keepUnique)
-      {
-         // We found the element in the tree...
-         auto it = find(t);
-         if (it != end())
-         {
-            std::pair<iterator, bool> pairReturn(it, false);
-            return pairReturn;
-         }
-      }
-
-      // Create a new node
-      BNode* pNew = new BNode(t);
+      std::pair<iterator, bool> pairReturn(end(), false);
 
       if (root == nullptr)
-         root = pNew;
-      else
       {
-         BNode* pParent = nullptr;
-         BNode* pCurrent = root;
-         while (pCurrent)
+         root = new BNode(t);
+         root->isRed = false;
+         numElements = 1;
+         pairReturn.first = iterator(root);
+         pairReturn.second = true;
+         return pairReturn;
+      }
+
+      BNode* pNode = root;
+      bool done = false;
+
+      while (!done)
+      {
+         if (keepUnique && t == pNode->data)
          {
-            pParent = pCurrent;
-            if (t < pCurrent->data)
+            pairReturn.first = iterator(pNode);
+            pairReturn.second = false;
+            return pairReturn;
+         }
+
+         if (t < pNode->data)
+         {
+            if (pNode->pLeft)
             {
-               pCurrent = pCurrent->pLeft;
-               if (pCurrent == nullptr)
-                  pParent->addLeft(pNew);
+               pNode = pNode->pLeft;
             }
             else
             {
-               pCurrent = pCurrent->pRight;
-               if (pCurrent == nullptr)
-                  pParent->addRight(pNew);
+               pNode->addLeft(t);
+               done = true;
+               pairReturn.first = iterator(pNode->pLeft);
+               pairReturn.second = true;
             }
          }
 
-         /*if (t < pParent->data)
-            pParent->addLeft(pNew);
          else
-            pParent->addRight(pNew);*/
-
-            //pNew->pParent = pParent; // addLeft and addRight set parent for us...
-      }
-      pNew->balance();
-      // Update root if need be... I DONT LIKE THIS BUT IT WORKS
-      if (root->pParent)
-      {
-         BNode* pNode = root;
-         BNode* pNewRoot = nullptr;
-         while (pNode)
          {
-            pNewRoot = pNode;
-            pNode = pNode->pParent;
+            if (pNode->pRight)
+            {
+               pNode = pNode->pRight;
+            }
+            else
+            {
+               pNode->addRight(t);
+               done = true;
+               pairReturn.first = iterator(pNode->pRight);
+               pairReturn.second = true;
+            }
          }
-         root = pNewRoot;
       }
+
       numElements++;
-      return std::pair<iterator, bool>(iterator(pNew), true);
+      while (root->pParent)
+
+         root = root->pParent;
+
    }
 
    template <typename T>
    std::pair<typename BST <T> ::iterator, bool> BST <T> ::insert(T&& t, bool keepUnique)
    {
-      if (keepUnique)
-      {
-         // We found the element in the tree...
-         auto it = find(t);
-         if (it != end())
-         {
-            std::pair<iterator, bool> pairReturn(it, false);
-            return pairReturn;
-         }
-      }
-
-      // Create a new node
-      BNode* pNew = new BNode(std::move(t));
+      std::pair<iterator, bool> pairReturn(end(), false);
 
       if (root == nullptr)
-         root = pNew;
-      else
       {
-         BNode* pParent = nullptr;
-         BNode* pCurrent = root;
-         while (pCurrent)
+         root = new BNode(std::move(t));
+         root->isRed = false;
+         numElements = 1;
+         pairReturn.first = iterator(root);
+         pairReturn.second = true;
+         return pairReturn;
+      }
+
+      BNode* pNode = root;
+      bool done = false;
+
+      while (!done)
+      {
+         if (keepUnique && t == pNode->data)
          {
-            pParent = pCurrent;
-            if (pNew->data < pCurrent->data)
+            pairReturn.first = iterator(pNode);
+            pairReturn.second = false;
+            return pairReturn;
+         }
+
+         if (t < pNode->data)
+         {
+            if (pNode->pLeft)
             {
-               pCurrent = pCurrent->pLeft;
-               if (pCurrent == nullptr)
-                  pParent->addLeft(pNew);
+               pNode = pNode->pLeft;
             }
             else
             {
-               pCurrent = pCurrent->pRight;
-               if (pCurrent == nullptr)
-                  pParent->addRight(pNew);
+               pNode->addLeft(t);
+               done = true;
+               pairReturn.first = iterator(pNode->pLeft);
+               pairReturn.second = true;
             }
          }
 
-         /*if (pNew->data < pParent->data)
-            pParent->addLeft(pNew);
          else
-            pParent->addRight(pNew);*/
-
-            //pNew->pParent = pParent;
-      }
-      pNew->balance();
-      // Update root if need be... I DONT LIKE THIS BUT IT WORKS
-      if (root->pParent)
-      {
-         BNode* pNode = root;
-         BNode* pNewRoot = nullptr;
-         while (pNode)
          {
-            pNewRoot = pNode;
-            pNode = pNode->pParent;
+            if (pNode->pRight)
+            {
+               pNode = pNode->pRight;
+            }
+            else
+            {
+               pNode->addRight(t);
+               done = true;
+               pairReturn.first = iterator(pNode->pRight);
+               pairReturn.second = true;
+            }
          }
-         root = pNewRoot;
       }
+
       numElements++;
-      return std::pair<iterator, bool>(iterator(pNew), true);
+      while (root->pParent)
+      
+         root = root->pParent;
+      
+      return pairReturn;
    }
 
    /*************************************************
@@ -732,8 +735,8 @@ namespace custom
    {
       if (pNode)
          pNode->pParent = this;
-
       this->pLeft = pNode;
+      pNode->balance();
    }
 
    /******************************************************
@@ -745,8 +748,8 @@ namespace custom
    {
       if (pNode)
          pNode->pParent = this;
-
       this->pRight = pNode;
+      pNode->balance();
    }
 
    /******************************************************
@@ -759,6 +762,7 @@ namespace custom
       BNode* pAdd = new BNode(t);
       pAdd->pParent = this;
       this->pLeft = pAdd;
+      pAdd->balance();
    }
 
    /******************************************************
@@ -771,6 +775,7 @@ namespace custom
       BNode* pAdd = new BNode(std::move(t));
       pAdd->pParent = this;
       this->pLeft = pAdd;
+      pAdd->balance();
    }
 
    /******************************************************
@@ -783,6 +788,7 @@ namespace custom
       BNode* pAdd = new BNode(t);
       pAdd->pParent = this;
       this->pRight = pAdd;
+      pAdd->balance();
    }
 
    /******************************************************
@@ -795,6 +801,7 @@ namespace custom
       BNode* pAdd = new BNode(std::move(t));
       pAdd->pParent = this;
       this->pRight = pAdd;
+      pAdd->balance();
    }
 
    /******************************************************
