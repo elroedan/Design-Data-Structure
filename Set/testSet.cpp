@@ -27,7 +27,7 @@ int main()
    // unit tests
    TestSpy().run();
    TestBST().run();
-   //TestSet().run();
+   TestSet().run();
 #endif // DEBUG
    
    return 0;

@@ -90,7 +90,7 @@ public:
       test_find_standardMissing();
 
       // Insert
-      /*test_insert_empty();
+      test_insert_empty();
       test_insert_standardEnd();
       test_insert_standardFront();
       test_insert_standardMiddle();
@@ -104,7 +104,7 @@ public:
       test_insertInit_emptyInsertMany();
       test_insertInit_standardInsertNone();
       test_insertInit_standardInsertDuplicates();
-      test_insertInit_manyInsertMany();*/
+      test_insertInit_manyInsertMany();
 
       // Remove
       test_clear_empty();

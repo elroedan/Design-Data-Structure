@@ -55,15 +55,18 @@ public:
    set(set && rhs) : bst(std::move(rhs.bst))
    { 
    }
-   set(const std::initializer_list <T> & il) : bst(il)
+   set(const std::initializer_list <T> & il)
    {
+      for (const auto& item : il) {
+          bst.insert(item, true); 
+      }
    }
    template <class Iterator>
    set(Iterator first, Iterator last)
    { 
       while (first != last)
       {
-         bst.insert(*first);
+         bst.insert(*first, true);
          first++;
       }
    }
@@ -75,12 +78,19 @@ public:
 
    set & operator = (const set & rhs)
    {
-      clear();
+      if (this == &rhs) 
+      {
+          return *this;
+      }
       bst = rhs.bst;
       return *this;
    }
    set & operator = (set && rhs)
    {
+      if (this == &rhs)
+      {
+          return *this;
+      }
       clear();
       swap(rhs);
       return *this;
@@ -88,8 +98,11 @@ public:
    set & operator = (const std::initializer_list <T> & il)
    {
       clear();
-      bst = il;
+      for (const auto& item : il) {
+          bst.insert(item, true);
+      }
       return *this;
+
    }
    void swap(set& rhs) noexcept
    {
@@ -145,15 +158,15 @@ public:
    }
    void insert(const std::initializer_list <T>& il)
    {
-      /*for (auto it = il.begin(); it != il.end(); it++)
-         bst.insert(*it, true);*/
+      for (auto it = il.begin(); it != il.end(); it++)
+         bst.insert(*it, true);
       
    }
    template <class Iterator>
    void insert(Iterator first, Iterator last)
    {
-      //for (auto it = first; it != last; it++)
-      //   bst.insert(*it, true);
+      for (auto it = first; it != last; it++)
+         bst.insert(*it, true);
    }
 
 
