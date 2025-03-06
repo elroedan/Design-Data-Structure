@@ -16,7 +16,7 @@
  * Author
  *    Jacob Mower
  *    Elroe Woldemichael
- *    Thatcher Albiston
+ *    Thatcher Albiston - Yo
  ************************************************************************/
 
 #pragma once
