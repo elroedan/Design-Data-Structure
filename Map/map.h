@@ -16,7 +16,7 @@
  * Author
  *    Jacob Mower
  *    Elroe Woldemichael
- *    Thatcher Albiston - Yo
+ *    Thatcher Albiston 
  ************************************************************************/
 
 #pragma once
@@ -66,23 +66,16 @@ public:
    template <class Iterator>
    map(Iterator first, Iterator last) 
    {
-      /*while (first != last)
-      {
-         bst.insert(*first, true);
-         first++;
-      }*/
       // use map's range insert 
       insert(first, last);
    }
    map(const std::initializer_list <Pairs>& il)
    {
-      /*for (const auto& item : il) 
-          bst.insert(item, true);*/
-      // use map's init insert 
       insert(il);
    }
   ~map()         
    {
+     /* Calls ~BST() */
    }
 
    //
@@ -101,9 +94,6 @@ public:
    map & operator = (const std::initializer_list <Pairs> & il)
    {
       clear();
-      /*for (const auto& item : il) {
-          bst.insert(item, true);
-      }*/
       // use map's init insert 
       insert(il);
       return *this;
@@ -139,16 +129,16 @@ public:
    //
    custom::pair<typename map::iterator, bool> insert(Pairs && rhs)
    {
-      /*std::pair<iterator, bool> p = bst.insert(std::move(rhs), true);
-      return pair<iterator, bool>(iterator(p.first), p.second);*/
+      // use bst's insert 
       auto pbst = bst.insert(std::move(rhs));
+      // turn std::pair into our custom::pair 
       return pair<iterator, bool>(iterator(pbst.first), pbst.second);
    }
    custom::pair<typename map::iterator, bool> insert(const Pairs & rhs)
    {
-      /*std::pair<iterator, bool> p = bst.insert(rhs, true);
-      return pair<iterator, bool>(iterator(p.first), p.second);*/
+      // use bst's insert 
       auto pbst = bst.insert(rhs);
+      // turn std::pair into our custom::pair 
       return pair<iterator, bool>(iterator(pbst.first), pbst.second);
    }
 
@@ -160,8 +150,6 @@ public:
    }
    void insert(const std::initializer_list <Pairs>& il)
    {
-      /*for (auto it = il.begin(); it != il.end(); it++)
-         bst.insert(*it, true);*/
       for (auto&& element : il)
          bst.insert(element, true);
    }
@@ -293,16 +281,16 @@ private:
 template <typename K, typename V>
 V& map <K, V> :: operator [] (const K& key)
 {
-   /*auto it = bst.find(pair);
-   if (it != bst.end())
-      return it.pNode->data.second;
-   bst.insert(pair);
-   return bst.find(pair).pNode->data.second;*/
+   // create a pair using key 
    pair<K, V> pair(key);
+   // look for the key in our bst 
    auto pbst = bst.find(pair);
+   // did we find the key? 
    if (pbst != bst.end())
+      // return the associated value 
       return pbst.pNode->data.second;
    else
+      // otherwise insert the key and return it's value
       return bst.insert(pair, true).first.pNode->data.second;
 }
 
@@ -313,16 +301,16 @@ V& map <K, V> :: operator [] (const K& key)
 template <typename K, typename V>
 const V& map <K, V> :: operator [] (const K& key) const
 {
-   /*auto it = bst.find(key);
-   if (it != bst.end())
-      return it.pNode->data.second;
-   bst.insert(key);
-   return bst.find(key).pNode->data.second;*/
+   // create a pair using key 
    pair<K, V> pair(key);
+   // look for the key in our bst 
    auto pbst = bst.find(pair);
+   // did we find the key? 
    if (pbst != bst.end())
+      // return the associated value 
       return pbst.pNode->data.second;
    else
+      // otherwise insert the key and return it's value
       return bst.insert(pair, true).first.pNode->data.second;
 }
 
@@ -333,16 +321,14 @@ const V& map <K, V> :: operator [] (const K& key) const
 template <typename K, typename V>
 V& map <K, V> ::at(const K& key)
 {
-   /*auto it = bst.find(key);
-   if (it != bst.end())
-      return it.pNode->data.second;
-   throw std::out_of_range("invalid map<K, T> key");*/
-   //pair<K, V> pair(key);
-   //auto pbst = bst.find(pair);
+   // look for the key in our bst 
    auto pbst = bst.find(pair<K, V>(key));
+   // was it found? 
    if (pbst != bst.end())
+      // return the associated value 
       return pbst.pNode->data.second;
    else
+      // otherwise throw 
       throw std::out_of_range("invalid map<K, T> key");
 }
 /*****************************************************
@@ -352,16 +338,14 @@ V& map <K, V> ::at(const K& key)
 template <typename K, typename V>
 const V& map <K, V> ::at(const K& key) const
 {
-   /*auto it = bst.find(key);
-   if (it != bst.end())
-      return it.pNode->data.second;
-   throw std::out_of_range("invalid map<K, T> key");*/
-   //pair<K, V> pair(key);
-   //auto pbst = bst.find(pair);
+   // look for the key in our bst 
    auto pbst = bst.find(pair<K, V>(key));
+   // was it found? 
    if (pbst != bst.end())
+      // return the associated value 
       return pbst.pNode->data.second;
    else
+      // otherwise throw 
       throw std::out_of_range("invalid map<K, T> key");
 }
 
@@ -372,6 +356,7 @@ const V& map <K, V> ::at(const K& key) const
 template <typename K, typename V>
 void swap(map <K, V>& lhs, map <K, V>& rhs)
 {
+   // call bst's swap 
    lhs.bst.swap(rhs.bst);
 }
 
@@ -382,9 +367,13 @@ void swap(map <K, V>& lhs, map <K, V>& rhs)
 template <typename K, typename V>
 size_t map<K, V>::erase(const K& k)
 {
+   // look for the key, k 
    iterator it = find(k);
+   // found it? 
    if (it == this->end())
+      // no...
       return 0;
+   // yes... so, erase it
    erase(it);
    return 1;
 }
@@ -396,11 +385,10 @@ size_t map<K, V>::erase(const K& k)
 template <typename K, typename V>
 typename map<K, V>::iterator map<K, V>::erase(map<K, V>::iterator first, map<K, V>::iterator last)
 {
+   // loop through elements from first to last 
    while (first != last)
-   {
+      // update first as next element after deleting previous first 
       first = erase(first);
-      
-   }
    return last;
 }
 
@@ -411,6 +399,7 @@ typename map<K, V>::iterator map<K, V>::erase(map<K, V>::iterator first, map<K, 
 template <typename K, typename V>
 typename map<K, V>::iterator map<K, V>::erase(map<K, V>::iterator it)
 {
+   // use bst's erase 
    return iterator(bst.erase(it.it));
 }
 
