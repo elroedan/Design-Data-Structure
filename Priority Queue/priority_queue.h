@@ -133,9 +133,11 @@ const T & priority_queue <T, Container, Compare> :: top() const
 template <class T, class Container, class Compare>
 void priority_queue <T, Container, Compare> :: pop()
 {
-   if (size() == 0)
+   using std::swap; 
+
+   if (empty())
       return;
-   std::swap(container[0], container[size() - 1]);
+   swap(container[0], container[size() - 1]);
    container.pop_back();
    percolateDown(1);
 }
@@ -148,7 +150,7 @@ template <class T, class Container, class Compare>
 void priority_queue <T, Container, Compare> :: push(const T & t)
 {
    container.push_back(t);
-   int parentIndex = size() / 2;
+   size_t parentIndex = size() / 2;
    while (parentIndex && percolateDown(parentIndex))
       parentIndex /= 2;
 }
@@ -156,7 +158,7 @@ template <class T, class Container, class Compare>
 void priority_queue <T, Container, Compare> :: push(T && t)
 {
    container.push_back(std::move(t));
-   int parentIndex = size() / 2;
+   size_t parentIndex = size() / 2;
    while (parentIndex && percolateDown(parentIndex))
       parentIndex /= 2;
 }
@@ -170,27 +172,34 @@ void priority_queue <T, Container, Compare> :: push(T && t)
 template <class T, class Container, class Compare>
 bool priority_queue <T, Container, Compare> :: percolateDown(size_t indexHeap)
 {
-//   indexHeap --;
-   if (indexHeap >= size())
-      return false;
-   
-   size_t indexRight = indexHeap * 2;
-   size_t indexLeft = indexRight - 1;
-   size_t indexBigger = indexLeft;
-   if (indexRight >= size())
+   // use the template variables swap() if they have it, otherwise std::swap()...
+   using std::swap; 
+
+   // Are we a leaf? 
+   if (indexHeap * 2 > size())
       return false;
 
-   if (indexRight <= size() && container[indexLeft] < container[indexRight])
+   // HeapI:  1   2  3  4  5  6  7 
+   //        [10, 8, 7, 4, 3, 9, 5]
+   // VecI:   0   1  2  3  4  5  6 
+
+   size_t indexRight = indexHeap * 2; 
+   size_t indexLeft = indexRight - 1;
+   size_t indexBigger = indexLeft;
+
+   // If indexRight == size() then the node has no right child and defaults to indexLeft...
+   // Which child is larger? 
+   if (indexRight < size() && compare(container[indexLeft], container[indexRight]))
       indexBigger = indexRight;
-   else
-      indexBigger = indexLeft;
-      
-   assert(indexBigger < size());
    
-   if (container[indexHeap-1] < container[indexBigger])
+   // If we've made it this far then 
+   //assert(indexLeft < size());
+   //assert(indexBigger < size());
+   
+   // Use the compare member variable...
+   if (compare(container[indexHeap - 1], container[indexBigger]))
    {
-      std::swap(container[indexHeap-1], container[indexBigger]);
-//      std::cout << "heap" << container[indexHeap-1].p << "bigger" << container[indexBigger].p << std::endl;
+      swap(container[indexHeap - 1], container[indexBigger]);
       percolateDown(indexBigger + 1);
       return true;
    }
@@ -205,10 +214,10 @@ bool priority_queue <T, Container, Compare> :: percolateDown(size_t indexHeap)
 template <class T, class Container, class Compare>
 void priority_queue <T, Container, Compare> ::heapify()
 {
-//   for (int i = 0; i < size(); i++) 
-//   {
-//      percolateDown(i);
-//   }
+   // Start from last node with children and iterate down...
+   for (size_t i = size() / 2; i > 0; --i)
+      // No need to change index by 1...
+      percolateDown(i);
 }
 
 /************************************************
