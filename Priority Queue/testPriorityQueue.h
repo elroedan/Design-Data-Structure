@@ -872,6 +872,7 @@ public:
       Spy::reset();
       // Exercise
       bool returnValue = pq.percolateDown(3 /*indexHeap*/);
+      
       // Verify
       assertUnit(Spy::numLessthan() == 2);    // compare [9<5][9<7]
       assertUnit(Spy::numSwap() == 1);        // swap of [7,9]
