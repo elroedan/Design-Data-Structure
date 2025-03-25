@@ -43,7 +43,11 @@ public:
    // Construct
    //
    deque(const A& a = A())
-   { data = nullptr;
+   { 
+      data = nullptr;
+      numElements = 0;
+      numBlocks = 0; 
+      numCells = 16; 
    }
    deque(deque & rhs);
    ~deque()
@@ -89,11 +93,15 @@ public:
    }
    T & operator[](int id)
    {
-      return *(new T);
+      assert(0 <= id < numElements);
+      assert(nullptr != data[ibFromID(id)]);
+      return data[ibFromID(id)][icFromID(id)];
    }
    const T & operator[](int id) const
    {
-      return *(new T);
+      assert(0 <= id < numElements);
+      assert(nullptr != data[ibFromID(id)]);
+      return data[ibFromID(id)][icFromID(id)];
    }
 
    //
@@ -121,24 +129,28 @@ private:
    // array index from deque index
    int iaFromID(int id) const
    {
-      //assert(0 <= id < numElements);
-      //assert(0 <= iaFront < numCells * numBlocks);
-      //int ia = (id + iaFront) % numCells * numBlocks; 
-      //assert(0 <= ia < numCells * numBlocks);
-      //return ia;
-      return 0;
+      assert(0 <= id < numElements);
+      assert(0 <= iaFront < numCells * numBlocks);
+      int ia = (id + iaFront) % numCells * numBlocks; 
+      assert(0 <= ia < numCells * numBlocks);
+      return ia;
+      //return 0;
    }
 
    // block index from deque index
    int ibFromID(int id) const
    {
-      return -1;
+      int ib = iaFromID(id) / numCells;
+      assert(0 <= ib < numBlocks);
+      return ib;
    }
 
    // cell index from deque index
    int icFromID(int id) const
    {
-      return -1;
+      int ic = iaFromID(id) % numCells;
+      assert(0 <= ic < numCells);
+      return ic;
    }
 
    // reallocate
@@ -171,13 +183,13 @@ public:
    // 
    // Construct
    //
-   iterator() 
+   iterator() : d(nullptr), id(0)
    {
    }
-   iterator(int id, deque* d) 
+   iterator(int id, deque* d) : d(d), id(id)
    {
    }
-   iterator(const iterator& rhs) 
+   iterator(const iterator& rhs) : d(rhs.d), id(rhs.id)
    { 
    }
 
@@ -186,21 +198,23 @@ public:
    //
    iterator& operator = (const iterator& rhs)
    {
+      this = rhs.d;
+      this = rhs.id;
       return *this;
    }
 
    // 
    // Compare
    //
-   bool operator != (const iterator& rhs) const { return true; }
-   bool operator == (const iterator& rhs) const { return true; }
+   bool operator != (const iterator& rhs) const { return this->d != rhs.d && this->id != rhs.id; }
+   bool operator == (const iterator& rhs) const { return this->d == rhs.d && this->id == rhs.id; }
 
    // 
    // Access
    //
    T& operator * ()
    {
-      return *(new T);
+      return d[id];
    }
 
    // 
@@ -244,6 +258,7 @@ private:
 template <typename T, typename A>
 deque <T, A> ::deque(deque& rhs) 
 {
+   this = rhs;
 }
 
 /*****************************************
@@ -318,6 +333,7 @@ void deque <T, A> :: pop_front()
 template <typename T, typename A>
 void deque <T, A> ::pop_back()
 {
+   
 }
 
 /*****************************************
@@ -327,6 +343,17 @@ void deque <T, A> ::pop_back()
 template <typename T, typename A>
 void deque <T, A> :: reallocate(int numBlocksNew)
 {
+   assert(numBlocksNew > 0 && numBlocksNew > numElements);
+
+   T** dataNew = new T * [numBlocksNew];
+   for (int id = 0; id < numElements; id++)
+   {
+      dataNew[id] = std::move(this->data[id]);
+   }
+   //numCapacity = numBlocksNew;
+   iaFront = 0;
+   delete data;
+   data = dataNew;
 }
 
 
