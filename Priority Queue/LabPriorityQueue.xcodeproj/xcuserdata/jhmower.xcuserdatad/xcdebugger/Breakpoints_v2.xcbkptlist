@@ -7,32 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1BE0B1AA-E602-4540-BD4C-5686D0C765EF"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "priority_queue.h"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "192"
-            endingLineNumber = "192"
-            landmarkName = "percolateDown(indexHeap)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "51DD8BD1-E8A6-4AA7-A83E-6C4477B26502"
+            uuid = "DC9475D4-D752-46EA-AE0A-966027F5E6D8"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "testPriorityQueue.h"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "440"
-            endingLineNumber = "440"
-            landmarkName = "test_constructMoveInit_one()"
+            startingLineNumber = "351"
+            endingLineNumber = "351"
+            landmarkName = "test_constructRange_one()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

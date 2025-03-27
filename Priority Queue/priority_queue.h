@@ -60,6 +60,12 @@ public:
    template <class Iterator>
    priority_queue(Iterator first, Iterator last, const Compare & c = Compare()) 
    {
+      container.reserve(last - first);
+      while (first != last)
+      {
+         push(*first);
+         first ++;
+      }
    }
    explicit priority_queue (const Compare& c, Container && rhs)
    : compare(c), container(std::move(rhs))
@@ -179,9 +185,6 @@ bool priority_queue <T, Container, Compare> :: percolateDown(size_t indexHeap)
    if (indexHeap * 2 > size())
       return false;
 
-   // HeapI:  1   2  3  4  5  6  7 
-   //        [10, 8, 7, 4, 3, 9, 5]
-   // VecI:   0   1  2  3  4  5  6 
 
    size_t indexRight = indexHeap * 2; 
    size_t indexLeft = indexRight - 1;
@@ -193,8 +196,8 @@ bool priority_queue <T, Container, Compare> :: percolateDown(size_t indexHeap)
       indexBigger = indexRight;
    
    // If we've made it this far then 
-   //assert(indexLeft < size());
-   //assert(indexBigger < size());
+   assert(indexLeft < size());
+   assert(indexBigger < size());
    
    // Use the compare member variable...
    if (compare(container[indexHeap - 1], container[indexBigger]))
