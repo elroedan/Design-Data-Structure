@@ -132,8 +132,8 @@ private:
    int iaFromID(int id) const
    {
       assert(id >= 0);
-      if (numElements > 0)
-//         assert(id < numElements);
+      //if (numElements > 0)
+         //assert(id < numElements);
       assert(0 <= iaFront && iaFront < (numCells * numBlocks));
       int ia = (id + iaFront) % (numCells * numBlocks);
       assert(0 <= ia && ia < (numCells * numBlocks));
