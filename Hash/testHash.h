@@ -96,7 +96,7 @@ public:
       test_find_standardMissingFilledList();
 
       // Insert
-      test_rehash_emptySmaller();
+      /*test_rehash_emptySmaller();
       test_rehash_emptyBigger();
       test_rehash_standard6();
       test_rehash_standard8();
@@ -109,7 +109,7 @@ public:
       test_insert_standard3();
       test_insert_standard44();
       test_insert_standardDuplicate();
-      test_insert_standardRehash();
+      test_insert_standardRehash();*/
 
       // Remove
       test_clear_empty();

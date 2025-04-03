@@ -112,7 +112,15 @@ namespace custom
       //
       // Access
       //
-
+      iterator find(const T& t)
+      {
+         for (auto it = begin(); it != end(); it++)
+         {
+            if (*it == t)
+               return it;
+         }
+         return end();
+      }
       T& front();
       T& back();
 
