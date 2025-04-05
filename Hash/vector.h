@@ -208,6 +208,14 @@ namespace custom
          return it;
       }
 
+      // N steps forward 
+      iterator operator + (int n) const
+      {
+         iterator tmp(*this);
+         tmp.p += n;
+         return tmp;
+      }
+
    private:
       T* p;
    };
@@ -265,13 +273,17 @@ namespace custom
     * construct each element, and copy the values over
     ****************************************/
    template <typename T, typename A>
-   vector <T, A> ::vector(size_t num, const A& a) : alloc(a), numCapacity(num), numElements(num)
+   vector <T, A> ::vector(size_t num, const A& a) : alloc(a), numCapacity(num), numElements(num), data(nullptr)
    {
       // Allocate memory if num > 0, otherwise set data to nullptr
       if (num > 0)
-         data = new T[num];
-      else
-         data = nullptr;
+      {
+         data = alloc.allocate(num);
+         for (size_t i = 0; i < num; i++)
+            new (&data[i]) T; 
+      }
+      // what does this do? 
+      //data = new T[num];
    }
 
    /*****************************************
