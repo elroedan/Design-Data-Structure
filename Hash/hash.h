@@ -49,11 +49,9 @@ public:
    //
    unordered_set() : maxLoadFactor(1.0), numElements(0), buckets(8)
    {
-      //buckets.resize(8);
    }
    unordered_set(size_t numBuckets) : maxLoadFactor(1.0), numElements(0), buckets(numBuckets)
    {
-      //buckets.resize(numBuckets);
    }
    unordered_set(const unordered_set&  rhs) : maxLoadFactor(rhs.maxLoadFactor), numElements(rhs.numElements), buckets(rhs.buckets)
    {
@@ -61,13 +59,10 @@ public:
    unordered_set(unordered_set&& rhs) : maxLoadFactor(std::move(rhs.maxLoadFactor)), numElements(std::move(rhs.numElements)), buckets(std::move(rhs.buckets))
    {
    }
-   template <class Iterator>
+   template <class Iterator>                                                          
    unordered_set(Iterator first, Iterator last) : maxLoadFactor(1.0), numElements(0), buckets(std::distance(first, last))
-   {
-      // Reserve first 
-      //reserve(last - first);
-      //reserve(std::distance(first, last));
-
+   {                                                                                  // get the required amount of buckets to store the elements
+      // insert the elements from the other container 
       for (auto it = first; it != last; it++)
          insert(*it);
    }
@@ -80,15 +75,18 @@ public:
    {
       maxLoadFactor = rhs.maxLoadFactor;
       numElements = rhs.numElements;
+      // call vector's copy-assign operator 
       buckets = rhs.buckets;
       return *this;
    }
    unordered_set& operator=(unordered_set&& rhs)
    {
+      // do nothing if we are RHS afterall, we are already ourself!!!
       if (this != &rhs) 
       {
          maxLoadFactor = std::move(rhs.maxLoadFactor);
          numElements = std::move(rhs.numElements);
+         // call vector's move-assign operator 
          buckets = std::move(rhs.buckets);
 
          rhs.maxLoadFactor = 1.0;
@@ -99,17 +97,20 @@ public:
    }
    unordered_set& operator=(const std::initializer_list<T>& il)
    {
+      // clear the set because we can't keep the old buckets 
       clear(); 
+
+      // loop over the initializer list, inserting each element 
       for (const auto& elem : il) {
          insert(elem);
       }
+
       return *this;
    }
    void swap(unordered_set& rhs)
    {
       std::swap(this->numElements, rhs.numElements);
       std::swap(this->maxLoadFactor, rhs.maxLoadFactor);
-      //std::swap(this->buckets, rhs.buckets);
       buckets.swap(rhs.buckets);
    }
 
@@ -120,12 +121,14 @@ public:
    class local_iterator;
    iterator begin()
    {
+      // iterate through buckets 
       for (auto it = buckets.begin(); it != buckets.end(); it++)
       {
+         // if the bucket isn't empty, return iterator to that element 
          if (!(*it).empty())
             return iterator(buckets.end(), it, (*it).begin());
-         
       }
+      // return end() if the set is empty 
       return end();
    }
    iterator end()
@@ -146,8 +149,8 @@ public:
    //
    size_t bucket(const T& t)
    {
-      Hash hash;
-      return hash(t) % bucket_count();
+      // mod the hash value of element by number of buckets to find the bucket that t belongs in 
+      return Hash{}(t) % bucket_count();
    }
    iterator find(const T& t);
 
@@ -159,7 +162,14 @@ public:
    void rehash(size_t numBuckets);
    void reserve(size_t num)
    {
-      //buckets.resize(num);
+      // rehash takes numBuckets 
+      // maxLoadFactor = numElements / numBuckets 
+      // Let numBuckets = x 
+      // solve for x: 
+      // maxLoadFactor = num / x 
+      // maxLoadFactor * x = num 
+      // x = num / maxLoadFactor 
+      // cast to size_t because rehash takes a size_t parameter...
       rehash(size_t(num / max_load_factor()));
    }
 
@@ -168,8 +178,10 @@ public:
    //
    void clear() noexcept
    {
+      // iterate over buckets 
       for (auto bucket = buckets.begin() ; bucket != buckets.end() ;  bucket++)
       {
+         // clear each bucket 
          (*bucket).clear();
       }
       numElements = 0;
@@ -210,23 +222,17 @@ public:
 
 private:
 
+   // return the minimum number of buckets required to maintain correct load factor, given "num" elements
    size_t min_buckets_required(size_t num) const
    {
-      /*
-         1.0 
-         loadFactor == numElements / bucket_count() 
-         numElements+1 / x < maxLoadFactor 1.0
-         
-         4/1.0 == x
-
-         4/1.0 == x
-      */
-      return std::ceil(num / max_load_factor());
-      /*if (max_load_factor() > num / bucket_count())
-         return bucket_count();
-      else
-         return bucket_count() * 2; */
-      //return (size_t)num / bucket_count() > maxLoadFactor;
+      // maxLoadFactor = numElements / bucket_count 
+      // let bucket_count = x 
+      // solve for x: 
+      // maxLoadFactor = num / x 
+      // maxLoadFactor * x = num 
+      // x = num / maxLoadFactor 
+      // round up because we can't round down and maintain correct load factor! 
+      return std::ceil(float(num) / max_load_factor());
    }
 
    custom::vector<custom::list<T,A>> buckets;  // each bucket in the hash
@@ -303,7 +309,9 @@ public:
    }
 
 private:
+   // friend that needs access to itVector and itList 
    friend unordered_set <T, H, E, A> ::iterator unordered_set<T, H, E, A>::erase(const T& t); 
+
    typename vector<list<T>>::iterator itVectorEnd;
    typename list<T>::iterator itList;
    typename vector<list<T>>::iterator itVector;
@@ -455,11 +463,14 @@ void unordered_set<T, H, E, A>::insert(const std::initializer_list<T> & il)
 template <typename T, typename Hash, typename E, typename A>
 void unordered_set<T, Hash, E, A>::rehash(size_t numBuckets)
 {
+   // do nothing if there is nothing to do 
    if (numBuckets <= bucket_count())
       return;
-   // allocate 
+
+   // allocate a new vector of size numBuckets 
    custom::vector<list<T>> bucketsNew(numBuckets);
    
+   // iterate over old buckets, moving elements over based on newly hashed index 
    for (auto it = this->begin(); it != this->end(); it++ )
    {
       // create our new index 
@@ -480,10 +491,15 @@ void unordered_set<T, Hash, E, A>::rehash(size_t numBuckets)
 template <typename T, typename H, typename E, typename A>
 typename unordered_set <T, H, E, A> ::iterator unordered_set<T, H, E, A>::find(const T& t)
 {
-   auto ibucket = bucket(t);
+   // get the index of element t 
+   size_t ibucket = bucket(t);
+   // use List's find() to find the element in the bucket 
    auto itList = buckets[ibucket].find(t);
+
+   // if the element was found, return an iterator to it 
    if (itList != buckets[ibucket].end())
-      return iterator(buckets.end(), custom::vector<list<T>>::iterator (ibucket, buckets), itList);
+      return iterator(buckets.end(), custom::vector<list<T>>::iterator(ibucket, buckets), itList);
+   // element wasn't found, return end() 
    return end();
 }
 
@@ -494,11 +510,16 @@ typename unordered_set <T, H, E, A> ::iterator unordered_set<T, H, E, A>::find(c
 template <typename T, typename H, typename E, typename A>
 typename unordered_set <T, H, E, A> ::iterator & unordered_set<T, H, E, A>::iterator::operator ++ ()
 {
+   // 1. Only advance if we are not already at the end 
    if (itVector == itVectorEnd)
       return *this;
+
+   // 2. Advance the list iterator. If we are not at the end, then we are done. 
    ++itList;
    if (itList != (*itVector).end())
       return *this;
+
+   // 3. We are at the end of the list. Find the next bucket 
    ++itVector;
    while (itVector != itVectorEnd && (*itVector).empty())
       ++itVector;
